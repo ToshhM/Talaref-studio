@@ -56,6 +56,7 @@ export const ExpertiseDeployment: React.FC = () => {
 
     return (
         <section
+            id="expertise"
             ref={containerRef}
             className="relative h-[450vh] bg-background flex flex-col items-center"
         >

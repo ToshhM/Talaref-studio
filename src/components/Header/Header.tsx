@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navItems = [
-    { label: 'Notre Agence', href: '#hero' },
-    { label: 'Portfolios', href: '#expertise' },
-    { label: 'Insights', href: '#projets' },
+    { label: 'Notre Agence', href: '/#hero' },
+    { label: 'Expertise', href: '/#expertise' },
+    { label: 'Portfolio', href: '/portfolio' },
+    { label: 'Contact', href: '/#contact' },
 ];
 
 export default function Header() {
