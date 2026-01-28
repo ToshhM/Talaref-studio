@@ -1,0 +1,221 @@
+.section {
+    position: relative;
+    padding: var(--space-section) 0;
+    background: var(--color-bg-dark);
+    overflow: hidden;
+}
+
+.container {
+    position: relative;
+    z-index: 2;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--space-xl);
+}
+
+/* Header */
+.header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto var(--space-4xl);
+}
+
+.label {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-md);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+    background: rgba(184, 206, 32, 0.1);
+    border: 1px solid rgba(184, 206, 32, 0.2);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-lg);
+}
+
+.title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: var(--space-lg);
+}
+
+.accent {
+    color: var(--color-accent);
+}
+
+.description {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+}
+
+/* Grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-xl);
+}
+
+/* Card */
+.card {
+    position: relative;
+    padding: var(--space-2xl);
+    background: var(--glass-bg);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all var(--transition-smooth);
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-xl);
+    padding: 1px;
+    background: linear-gradient(135deg,
+            var(--glass-border) 0%,
+            transparent 50%,
+            var(--glass-border) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.card:hover {
+    background: var(--glass-bg-hover);
+}
+
+.card:hover::before {
+    background: linear-gradient(135deg,
+            var(--color-accent) 0%,
+            transparent 50%,
+            var(--color-accent) 100%);
+}
+
+.card:hover .cardGlow {
+    opacity: 1;
+}
+
+/* Card Icon */
+.cardIcon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-xl);
+    transition: all var(--transition-base);
+}
+
+.card:hover .cardIcon {
+    background: rgba(184, 206, 32, 0.1);
+    border-color: rgba(184, 206, 32, 0.3);
+    transform: scale(1.1);
+}
+
+/* Card Content */
+.cardContent {
+    margin-bottom: var(--space-xl);
+}
+
+.cardTitle {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    margin-bottom: var(--space-md);
+    transition: color var(--transition-fast);
+}
+
+.card:hover .cardTitle {
+    color: var(--color-accent);
+}
+
+.cardDescription {
+    font-size: var(--font-size-base);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+}
+
+/* Feature Tags */
+.cardFeatures {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.featureTag {
+    padding: var(--space-xs) var(--space-md);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-full);
+    transition: all var(--transition-fast);
+}
+
+.card:hover .featureTag {
+    border-color: rgba(184, 206, 32, 0.2);
+    color: var(--color-text-primary);
+}
+
+/* Glow Effect */
+.cardGlow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center,
+            rgba(184, 206, 32, 0.1) 0%,
+            transparent 50%);
+    opacity: 0;
+    transition: opacity var(--transition-slow);
+    pointer-events: none;
+}
+
+/* Background Glow */
+.bgGlow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle,
+            rgba(0, 66, 105, 0.3) 0%,
+            transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+    .grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+    }
+
+    .card {
+        padding: var(--space-xl);
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 var(--space-md);
+    }
+
+    .cardIcon {
+        width: 56px;
+        height: 56px;
+        font-size: 1.5rem;
+    }
+}

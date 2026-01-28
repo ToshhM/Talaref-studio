@@ -1,0 +1,1 @@
+export { WaveBanner } from './WaveBanner';
