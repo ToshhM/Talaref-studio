@@ -1,4 +1,3 @@
-import { Resend } from 'resend'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -15,7 +14,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérification de la clé API
-    if (!process.env.RESEND_API_KEY) {
+    const apiKey = process.env.RESEND_API_KEY
+    if (!apiKey) {
       console.error('RESEND_API_KEY is not configured')
       return NextResponse.json(
         { error: 'Configuration email manquante' },
@@ -23,8 +23,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Initialisation de Resend (lazy loading pour éviter erreur au build)
-    const resend = new Resend(process.env.RESEND_API_KEY)
+    // Import dynamique de Resend pour éviter l'erreur au build
+    const { Resend } = await import('resend')
+    const resend = new Resend(apiKey)
 
     // Envoi de l'email
     const { data, error } = await resend.emails.send({
