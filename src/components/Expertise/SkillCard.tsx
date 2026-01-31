@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { ExpertiseItem } from './types';
-//import { useRouter } from 'next/router';
 
 interface SkillCardProps {
   item: ExpertiseItem;
@@ -12,7 +12,7 @@ interface SkillCardProps {
 }
 
 const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
-  //const router = useRouter();
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
 
   // Effet de parallaxe au survol
@@ -42,9 +42,7 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
   };
 
   const handleClick = () => {
-    // Redirection vers la page portfolio
-    // Tu pourras personnaliser les routes plus tard (ex: /portfolio/web-dev)
-    //router.push('/portfolio');
+    router.push(`/portfolio?category=${item.category}`);
   };
 
   return (

@@ -50,6 +50,9 @@ export const PROJECTS_DATA: Project[] = [
     slug: 'coriane-site-web',
     description: 'Proposition d\'une nouvelle identité pour le site web de Coriane une ESN parisienne',
     content: `
+    <div class="flex justify-center my-8">
+          <a href="https://ciorane-website.vercel.app/" target="_blank" rel="noopener noreferrer" style="background-color: #3d4f35; border: 2px solid #c8ff00; color: #c8ff00;" class="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-full hover:opacity-90 transition-all duration-300 uppercase tracking-wider">Voir le site web</a>
+        </div>
       <div class="prose prose-invert">
         <p class="text-xl text-gray-300 leading-relaxed">Refonte complète du site web de Coriane, une ESN parisienne spécialisée dans le recrutement IT. L'objectif : moderniser l'image de marque et créer une plateforme performante pour connecter talents et entreprises.</p>
 
@@ -122,31 +125,32 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     id: '3',
-    title: 'Reportage Photo Drone',
-    slug: 'reportage-photo-drone',
-    description: 'Captation aérienne et terrestre pour un projet immobilier de prestige avec vues spectaculaires.',
+    title: 'Alter - Shooting Photo',
+    slug: 'alter-shooting-photo',
+    description: 'Shooting photo pour une marque underground parisienne',
     content: `
       <div class="prose prose-invert">
-        <p class="text-xl">Shooting photo et vidéo utilisant des drones de dernière génération pour capturer un ensemble immobilier d'exception surplombant la Méditerranée.</p>
+        <p class="text-xl">Shooting photo pour capturer les pièces des créateurs pour une marque parisienne de vêtement.</p>
 
         <h2 class="text-3xl font-black mt-12 mb-6">Équipement Utilisé</h2>
-        <p>Nous avons déployé le DJI Mavic 3 Pro pour les prises aériennes, offrant une qualité d'image exceptionnelle même en conditions de lumière difficiles. Pour les photos terrestres, le Canon R5 avec objectifs prime garantit une netteté parfaite.</p>
+        <p>Nous avons utilisé le Sony A7IV avec objectifs 24-70mm f/2.8 pour garantir une netteté parfaite.</p>
 
         <h2 class="text-3xl font-black mt-12 mb-6">Conditions de Shooting</h2>
-        <p>Le timing était crucial pour ce projet. Nous avons effectué plusieurs sessions à l'aube et au crépuscule pour capturer la golden hour, moment où la lumière sublime l'architecture du bâtiment.</p>
+        <p>Pour ce projet nous étions au studio Honoré à Paris, c'était ma première fois dans ce studio qui est très bien équipé et choisi par le client.
+        En tant normal je shoot au studio NZO à levallois perret, qui est aussi très bien équipé. Nous aurons surement l'occasion de retourner dans ce studio pour de futurs projets.</p>
       </div>
     `,
     category: 'Photo',
-    tags: ['Drone', 'Immobilier', 'Aérien', 'Architecture'],
-    technologies: ['DJI Mavic 3 Pro', 'Canon R5', 'Adobe Lightroom', 'Photoshop', 'DaVinci Resolve'],
-    client: 'Immobilier Premium SAS',
-    project_date: '2024-10-05',
-    featured_image: 'https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=1200&h=800&fit=crop',
+    tags: ['Photo', 'Mode', 'Portrait', 'Studio'],
+    technologies: ['Sony A7IV', '24-70mm f/2.8', 'Adobe Lightroom', 'Photoshop',],
+    client: 'Alter',
+    project_date: '2024-14-01',
+    featured_image: 'http://www.image-heberg.fr/files/1769892078757193977.jpg',
     images: [
-      'https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1464938050520-ef2270bb8ce8?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1449157291145-7efd050a4d0e?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1200&h=800&fit=crop',
+      'https://www.image-heberg.fr/files/176989218170147494.jpg',
+      'http://www.image-heberg.fr/files/17698924203016739910.jpg',
+      'http://www.image-heberg.fr/files/17698924781155177515.jpg',
+      'http://www.image-heberg.fr/files/17698925113046017969.jpg',
     ],
     featured: false,
     published: true,
@@ -195,29 +199,35 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     id: '5',
-    title: 'Dashboard Analytics B2B',
-    slug: 'dashboard-analytics-b2b',
-    description: 'Interface de visualisation de données complexes pour une solution SaaS B2B avec exports automatisés.',
+    title: 'FootFactory',
+    slug: 'footfactory',
+    description: 'Plateforme sociale et innovante pour révéler des talents dans le foot amateur. ',
     content: `
       <div class="prose prose-invert">
-        <p class="text-xl">Dashboard interactif permettant de visualiser des métriques business en temps réel. Intégration avec multiples sources de données et exports personnalisés en PDF, Excel et CSV.</p>
+        <div class="flex justify-center my-8">
+          <a href="https://zingy-tarsier-b543e4.netlify.app" target="_blank" rel="noopener noreferrer" style="background-color: #3d4f35; border: 2px solid #c8ff00; color: #c8ff00;" class="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-full hover:opacity-90 transition-all duration-300 uppercase tracking-wider">Voir le site web</a>
+        </div>
+        <p class="text-xl">🧠 Idée : plateforme sociale et innovante pour révéler des talents dans le foot amateur. 
+        <br>🎯 Objectifs : donner de la visibilité aux joueurs via des trophées, de la com’ personnalisée, du contenu, du coaching.</p>
 
-        <h2 class="text-3xl font-black mt-12 mb-6">Visualisations</h2>
-        <p>Nous avons créé plus de 15 types de graphiques différents utilisant D3.js et Chart.js pour offrir une flexibilité maximale dans la présentation des données. Chaque visualisation est interactive et responsive.</p>
-
-        <h2 class="text-3xl font-black mt-12 mb-6">Performance</h2>
-        <p>Malgré le traitement de millions de points de données, le dashboard reste fluide grâce à des techniques de virtualisation et de lazy loading. Les requêtes sont optimisées avec des indexes PostgreSQL appropriés.</p>
-      </div>
+        <h2 class="text-3xl font-black mt-12 mb-6">Fonctionnalités</h2>
+        <p>🔧 Fonctionnalités clés :<br>
+        ● Présentation des projets (IA, trophée, com digitale, investisseurs).<br>
+        ● Système de vote (par coachs et public, pondéré), sur les match français U17 U19<br>
+        ● Intégration avec d’autres plateformes (Footadata, MTD).<br>
+        ● Formulaires dynamiques.<br>
+        ● Landing pages événementielles.</p>
     `,
     category: 'Web',
-    tags: ['SaaS', 'Dashboard', 'Data Viz', 'Analytics'],
-    technologies: ['Next.js', 'D3.js', 'Chart.js', 'PostgreSQL', 'Prisma', 'TanStack Query'],
-    client: 'DataFlow Inc',
-    project_date: '2024-08-30',
-    featured_image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=800&fit=crop',
+    tags: ['SaaS', 'Dashboard', 'Football', 'Analytics'],
+    technologies: ['Next.js', 'reactjs', 'tailwindcss', 'netlify', 'Supabase',],
+    client: 'HKZ Media',
+    project_date: '2024-03-30',
+    featured_image: 'http://www.image-heberg.fr/files/17698928181098605431.png',
     images: [
-      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=800&fit=crop',
+      'http://www.image-heberg.fr/files/17698928181098605431.png',
+      'http://www.image-heberg.fr/files/17698930504078779800.png',
+      'https://www.image-heberg.fr/files/17698930834074723247.png',
     ],
     featured: false,
     published: true,
@@ -227,30 +237,28 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     id: '6',
-    title: 'Portfolio Photographe',
-    slug: 'portfolio-photographe',
-    description: 'Site portfolio élégant pour un photographe professionnel avec galeries interactives et système de réservation.',
+    title: 'Shooting Monela Hair',
+    slug: 'shooting-monela-hair',
+    description: 'Shooting pour la marque Monela Hair, extensions et perruques',
     content: `
       <div class="prose prose-invert">
-        <p class="text-xl">Création d'un site portfolio sur mesure mettant en valeur le travail d'un photographe de mode et portrait. L'accent est mis sur l'expérience visuelle avec des transitions fluides et un design minimaliste.</p>
+        <p class="text-xl">-La marque Monela Hair est spécialisée dans la vente de perruques et d'extensions de cheveux de haute qualité. Nous avons réalisé un shooting photo pour mettre en valeur leurs produits et créer un contenu visuel attrayant pour leur site web et leurs réseaux sociaux.</p>
 
-        <h2 class="text-3xl font-black mt-12 mb-6">Galeries Interactives</h2>
-        <p>Nous avons développé un système de galeries personnalisé avec lazy loading progressif, lightbox immersive et navigation au clavier pour les power users. Les images sont optimisées automatiquement selon l'appareil.</p>
-
-        <h2 class="text-3xl font-black mt-12 mb-6">Système de Réservation</h2>
-        <p>Un module de prise de rendez-vous intégré permet aux clients de réserver directement des séances photo. Synchronisation avec Google Calendar et envoi automatique de confirmations.</p>
+        <h2 class="text-3xl font-black mt-12 mb-6">Lieux</h2>
+        <p>Nous avons réalisé ce shooting dans un cadre naturel et lumineux, dans le studio photo NZO STUDIO PROD à levallois perret </p>
       </div>
     `,
     category: 'Photo',
-    tags: ['Portfolio', 'Photography', 'Galerie', 'Booking'],
-    technologies: ['Next.js', 'Sanity CMS', 'Cloudinary', 'Calendly API', 'Tailwind CSS'],
-    client: 'Atelier Lumière',
-    project_date: '2024-07-18',
-    featured_image: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=1200&h=800&fit=crop',
+    tags: ['Branding', 'Photography', 'Shooting', 'Booking'],
+    technologies: ['Sony A7IV', 'Godox SL60W', '24mm-70mm F2/8'],
+    client: 'Monela Hair',
+    project_date: '2025-10-28',
+    featured_image: 'https://i.postimg.cc/jjMfnns0/monela_102.jpg',
     images: [
-      'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1606857521015-7f9fcf423740?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=1200&h=800&fit=crop',
+      'https://i.postimg.cc/DzxG447C/monela_22.jpg',
+      'https://i.postimg.cc/hG2mQQSF/monela_141.jpg',
+      'https://i.postimg.cc/CKc8nnw2/monela_53.jpg',
+      'https://i.postimg.cc/TPtb55TS/monela_113.jpg',
     ],
     featured: false,
     published: true,

@@ -9,7 +9,22 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'dl.pcloud.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'e.pcloud.link',
+      },
+      {
+        protocol: 'http',
+        hostname: '192.168.1.192',
+        port:'',
+        pathname: '/web_images/**',
+      },
     ],
+    unoptimized: true,
   },
 };
 

@@ -7,4 +7,5 @@ export interface ExpertiseItem {
     description: string;
     skills: string[];
     color: string;
+    category: 'Photo' | 'Web' | 'Design' | 'Projects';
 }

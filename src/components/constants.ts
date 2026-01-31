@@ -8,7 +8,8 @@ export const EXPERTISE_DATA: ExpertiseItem[] = [
     icon: "📸",
     description: "Production photo & vidéo professionnelle. Captation drone, montage créatif et post-production de qualité.",
     skills: ["Photographie", "Vidéo", "Drone", "Montage"],
-    color: "#B8CE20"
+    color: "#B8CE20",
+    category: "Photo"
   },
   {
     id: 2,
@@ -16,7 +17,8 @@ export const EXPERTISE_DATA: ExpertiseItem[] = [
     icon: "🌐",
     description: "Développement de sites web modernes et performants. Du design à la mise en ligne, une expérience complète.",
     skills: ["Next.js", "React", "SEO", "Performance"],
-    color: "#B8CE20"
+    color: "#B8CE20",
+    category: "Web"
   },
   {
     id: 3,
@@ -24,7 +26,8 @@ export const EXPERTISE_DATA: ExpertiseItem[] = [
     icon: "🎨",
     description: "Création graphique et identité visuelle. Design UI/UX et expériences utilisateurs immersives.",
     skills: ["UI/UX", "Branding", "Figma", "Motion"],
-    color: "#B8CE20"
+    color: "#B8CE20",
+    category: "Design"
   },
   {
     id: 4,
@@ -32,6 +35,7 @@ export const EXPERTISE_DATA: ExpertiseItem[] = [
     icon: "📋",
     description: "Pilotage de projets digitaux de A à Z. Stratégie de contenu et accompagnement personnalisé.",
     skills: ["Stratégie", "Agile", "Planning", "Audit"],
-    color: "#B8CE20"
+    color: "#B8CE20",
+    category: "Projects"
   }
 ];
