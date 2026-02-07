@@ -1,31 +1,53 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { WaveScene } from '@/utils/threeScene';
 
 export function WaveBanner() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<WaveScene | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
+    // Détection mobile
+    const checkMobile = () => {
+      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      ) || window.innerWidth < 768;
+      setIsMobile(mobile);
+    };
 
-    sceneRef.current = new WaveScene(canvasRef.current);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    // Ne pas initialiser Three.js sur mobile
+    if (!isMobile && canvasRef.current) {
+      sceneRef.current = new WaveScene(canvasRef.current);
+    }
 
     return () => {
+      window.removeEventListener('resize', checkMobile);
       if (sceneRef.current) {
         sceneRef.current.dispose();
       }
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <section className="relative w-full h-screen overflow-hidden bg-black">
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full opacity-45"
-      />
+      {/* Three.js Canvas - Desktop uniquement */}
+      {!isMobile && (
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full opacity-45"
+        />
+      )}
+
+      {/* Fond alternatif pour mobile - Gradient animé CSS */}
+      {isMobile && (
+        <div className="absolute inset-0 bg-gradient-to-br from-[#001829] via-[#003a5c] to-[#001829] animate-gradient-shift" />
+      )}
 
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60 z-[1]" />
 

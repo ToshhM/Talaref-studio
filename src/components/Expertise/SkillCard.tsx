@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ExpertiseItem } from './types';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 interface SkillCardProps {
   item: ExpertiseItem;
@@ -14,12 +15,16 @@ interface SkillCardProps {
 const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
+  const { isMobile, shouldReduceAnimations } = useDevicePerformance();
 
-  // Effet de parallaxe au survol
+  // Effet de parallaxe au survol (désactivé sur mobile)
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Désactiver le parallaxe sur mobile pour améliorer les performances
+    if (isMobile || shouldReduceAnimations) return;
+
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -54,11 +59,17 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
       onMouseEnter={handleMouseEnter}
       style={{
         ...style,
-        rotateX: rotateX,
-        rotateY: rotateY,
+        // Désactiver les rotations 3D sur mobile
+        rotateX: shouldReduceAnimations ? 0 : rotateX,
+        rotateY: shouldReduceAnimations ? 0 : rotateY,
       }}
-      transition={{ type: "spring", stiffness: 400, damping: 40 }}
-      whileHover={{
+      transition={{
+        type: shouldReduceAnimations ? "tween" : "spring",
+        stiffness: 400,
+        damping: 40,
+        duration: shouldReduceAnimations ? 0.2 : undefined
+      }}
+      whileHover={shouldReduceAnimations ? {} : {
         scale: 1.05,
         z: 50,
         transition: { duration: 0.3 }

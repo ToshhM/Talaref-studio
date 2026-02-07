@@ -65,3 +65,23 @@ body {
 .preserve-3d {
   transform-style: preserve-3d;
 }
+
+/* ========================
+   Mobile Wave Banner Alternative
+   ======================== */
+@keyframes gradient-shift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}

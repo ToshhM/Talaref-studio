@@ -4,10 +4,12 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { EXPERTISE_DATA } from '../constants';
 import SkillCard from './SkillCard';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 export const ExpertiseDeployment: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+    const { isMobile, shouldReduceAnimations } = useDevicePerformance();
 
     useEffect(() => {
         const handleResize = () => setWindowWidth(window.innerWidth);
@@ -20,10 +22,11 @@ export const ExpertiseDeployment: React.FC = () => {
         offset: ["start start", "end end"]
     });
 
+    // Spring plus léger sur mobile pour réduire les calculs
     const smoothProgress = useSpring(scrollYProgress, {
-        stiffness: 70,
-        damping: 30,
-        restDelta: 0.001
+        stiffness: shouldReduceAnimations ? 200 : 70,
+        damping: shouldReduceAnimations ? 50 : 30,
+        restDelta: shouldReduceAnimations ? 0.01 : 0.001
     });
 
     // --- ANIMATIONS DESKTOP (Déploiement en éventail centré) ---
@@ -45,10 +48,11 @@ export const ExpertiseDeployment: React.FC = () => {
     const op3 = useTransform(smoothProgress, [0.3, 0.5], [0, 1]);
     const op4 = useTransform(smoothProgress, [0.4, 0.6], [0, 1]);
 
-    // Cover Card (La carte qui s'efface au début)
-    const centralScale = useTransform(smoothProgress, [0, 0.2], [1, 0.3]);
-    const centralOpacity = useTransform(smoothProgress, [0, 0.15], [1, 0]);
-    const centralY = useTransform(smoothProgress, [0, 0.2], [0, -250]);
+    // Cover Card - animations simplifiées sur mobile (utilise scrollYProgress direct)
+    const coverProgress = shouldReduceAnimations ? scrollYProgress : smoothProgress;
+    const centralScale = useTransform(coverProgress, [0, 0.2], [1, shouldReduceAnimations ? 0.5 : 0.3]);
+    const centralOpacity = useTransform(coverProgress, [0, 0.15], [1, 0]);
+    const centralY = useTransform(coverProgress, [0, 0.2], [0, shouldReduceAnimations ? -100 : -250]);
 
     // Background Title
     const bgScale = useTransform(smoothProgress, [0, 1], [0.9, 1.1]);
@@ -62,13 +66,15 @@ export const ExpertiseDeployment: React.FC = () => {
         >
             <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden">
 
-                {/* Titre en arrière-plan (centré) */}
-                <motion.h2
-                    style={{ opacity: bgOp, scale: bgScale }}
-                    className="absolute text-[22vw] font-black text-white whitespace-nowrap select-none uppercase tracking-tighter z-0 pointer-events-none"
-                >
-                    EXPERTISE
-                </motion.h2>
+                {/* Titre en arrière-plan (centré) - caché sur mobile pour perf */}
+                {!shouldReduceAnimations && (
+                    <motion.h2
+                        style={{ opacity: bgOp, scale: bgScale }}
+                        className="absolute text-[22vw] font-black text-white whitespace-nowrap select-none uppercase tracking-tighter z-0 pointer-events-none"
+                    >
+                        EXPERTISE
+                    </motion.h2>
+                )}
 
                 {/* Carte de couverture (Initialement centrée) */}
                 <motion.div
@@ -76,7 +82,9 @@ export const ExpertiseDeployment: React.FC = () => {
                         scale: centralScale,
                         opacity: centralOpacity,
                         y: centralY,
-                        zIndex: 100
+                        zIndex: 100,
+                        // GPU acceleration hint
+                        willChange: shouldReduceAnimations ? 'auto' : 'transform, opacity'
                     }}
                     className="absolute flex flex-col items-center justify-center pointer-events-none"
                 >
@@ -89,36 +97,34 @@ export const ExpertiseDeployment: React.FC = () => {
                             <div className="w-3 h-3 rounded-full bg-background" />
                         </div>
                     </div>
-                    <motion.div
-                        animate={{ y: [0, 10, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="mt-10 flex flex-col items-center gap-3"
-                    >
-                        <span className="text-secondaire font-black tracking-[0.3em] text-[10px] uppercase">Scrollez pour déployer</span>
-                        {/* Flèche animée vers le bas */}
-                        <motion.div
-                            animate={{ y: [0, 8, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                            className="flex flex-col items-center"
-                        >
-                            <svg
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                className="text-secondaire"
-                            >
-                                <path
-                                    d="M12 4L12 20M12 20L6 14M12 20L18 14"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                />
+                    {/* Animations de flèche désactivées sur mobile */}
+                    {shouldReduceAnimations ? (
+                        <div className="mt-10 flex flex-col items-center gap-3">
+                            <span className="text-secondaire font-black tracking-[0.3em] text-[10px] uppercase">Scrollez pour déployer</span>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-secondaire">
+                                <path d="M12 4L12 20M12 20L6 14M12 20L18 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
+                            <div className="w-px h-16 bg-gradient-to-b from-secondaire to-transparent" />
+                        </div>
+                    ) : (
+                        <motion.div
+                            animate={{ y: [0, 10, 0] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="mt-10 flex flex-col items-center gap-3"
+                        >
+                            <span className="text-secondaire font-black tracking-[0.3em] text-[10px] uppercase">Scrollez pour déployer</span>
+                            <motion.div
+                                animate={{ y: [0, 8, 0] }}
+                                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                                className="flex flex-col items-center"
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-secondaire">
+                                    <path d="M12 4L12 20M12 20L6 14M12 20L18 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </motion.div>
+                            <div className="w-px h-16 bg-gradient-to-b from-secondaire to-transparent" />
                         </motion.div>
-                        <div className="w-px h-16 bg-gradient-to-b from-secondaire to-transparent" />
-                    </motion.div>
+                    )}
                 </motion.div>
 
                 {/* Mise en page Desktop : Déploiement horizontal centré */}

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { getDevicePerformance } from '@/hooks/useDevicePerformance';
 
 export class WaveScene {
   private scene: THREE.Scene;
@@ -8,8 +9,16 @@ export class WaveScene {
   private mouse: THREE.Vector2;
   private targetMouse: THREE.Vector2;
   private animationId: number | null = null;
+  private isMobile: boolean;
+  private lastFrameTime: number = 0;
+  private frameInterval: number;
 
   constructor(container: HTMLCanvasElement) {
+    const { isMobile, shouldReduceAnimations } = getDevicePerformance();
+    this.isMobile = isMobile || shouldReduceAnimations;
+    // 30 FPS sur mobile (33ms), 60 FPS sur desktop (16ms)
+    this.frameInterval = this.isMobile ? 33 : 16;
+
     this.mouse = new THREE.Vector2(0, 0);
     this.targetMouse = new THREE.Vector2(0, 0);
 
@@ -28,33 +37,40 @@ export class WaveScene {
 
     this.renderer = new THREE.WebGLRenderer({
       canvas: container,
-      antialias: true,
+      antialias: !this.isMobile, // Désactiver l'antialiasing sur mobile
       alpha: true,
-      powerPreference: 'high-performance',
+      powerPreference: this.isMobile ? 'low-power' : 'high-performance',
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // PixelRatio réduit sur mobile pour moins de pixels à calculer
+    this.renderer.setPixelRatio(this.isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.3;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    // Create abstract glass wave geometry
-    const geometry = new THREE.PlaneGeometry(16, 10, 200, 140);
+    // Géométrie réduite sur mobile : 100x70 au lieu de 200x140 (4x moins de vertices)
+    const segments = this.isMobile ? { x: 100, y: 70 } : { x: 200, y: 140 };
+    const geometry = new THREE.PlaneGeometry(16, 10, segments.x, segments.y);
     const positionAttribute = geometry.attributes.position;
 
     for (let i = 0; i < positionAttribute.count; i++) {
       const x = positionAttribute.getX(i);
       const y = positionAttribute.getY(i);
 
-      // Complex wave pattern for abstract look
-      const wave1 = Math.sin(x * 0.4) * Math.cos(y * 0.3);
-      const wave2 = Math.sin(x * 0.6 + 2) * Math.sin(y * 0.4);
-      const wave3 = Math.cos(x * 0.35 - 1) * Math.cos(y * 0.55);
-      const ripple = Math.sin(Math.sqrt(x * x + y * y) * 0.5);
-
-      const z = (wave1 * 1.2 + wave2 * 0.8 + wave3 * 0.6 + ripple * 0.4) * 1.5;
-
-      positionAttribute.setZ(i, z);
+      // Calculs simplifiés sur mobile (2 vagues au lieu de 4)
+      if (this.isMobile) {
+        const wave1 = Math.sin(x * 0.4) * Math.cos(y * 0.3);
+        const wave2 = Math.sin(x * 0.6 + 2) * Math.sin(y * 0.4);
+        const z = (wave1 * 1.2 + wave2 * 0.8) * 1.5;
+        positionAttribute.setZ(i, z);
+      } else {
+        const wave1 = Math.sin(x * 0.4) * Math.cos(y * 0.3);
+        const wave2 = Math.sin(x * 0.6 + 2) * Math.sin(y * 0.4);
+        const wave3 = Math.cos(x * 0.35 - 1) * Math.cos(y * 0.55);
+        const ripple = Math.sin(Math.sqrt(x * x + y * y) * 0.5);
+        const z = (wave1 * 1.2 + wave2 * 0.8 + wave3 * 0.6 + ripple * 0.4) * 1.5;
+        positionAttribute.setZ(i, z);
+      }
     }
 
     geometry.computeVertexNormals();
@@ -139,8 +155,18 @@ export class WaveScene {
   private animate = () => {
     this.animationId = requestAnimationFrame(this.animate);
 
-    this.mouse.x += (this.targetMouse.x - this.mouse.x) * 0.05;
-    this.mouse.y += (this.targetMouse.y - this.mouse.y) * 0.05;
+    // Throttle à 30 FPS sur mobile
+    const now = Date.now();
+    if (now - this.lastFrameTime < this.frameInterval) {
+      return;
+    }
+    this.lastFrameTime = now;
+
+    // Désactiver le parallaxe souris sur mobile (pas de souris)
+    if (!this.isMobile) {
+      this.mouse.x += (this.targetMouse.x - this.mouse.x) * 0.05;
+      this.mouse.y += (this.targetMouse.y - this.mouse.y) * 0.05;
+    }
 
     const time = Date.now() * 0.0004;
 
@@ -152,16 +178,21 @@ export class WaveScene {
       const x = positionAttribute.getX(i);
       const y = positionAttribute.getY(i);
 
-      // Layered wave patterns for abstract glass effect
-      const wave1 = Math.sin(x * 0.4 + time * 1.2) * Math.cos(y * 0.3 + time * 0.9);
-      const wave2 = Math.sin(x * 0.6 + time * 0.7 + 2) * Math.sin(y * 0.4 + time * 1.1);
-      const wave3 = Math.cos(x * 0.35 + time * 0.5 - 1) * Math.cos(y * 0.55 + time * 0.8);
-      const ripple = Math.sin(Math.sqrt(x * x + y * y) * 0.5 - time * 1.5);
-      const flow = Math.sin(x * 0.25 + time) * Math.cos(y * 0.2 + time * 0.6);
-
-      const z = (wave1 * 1.2 + wave2 * 0.8 + wave3 * 0.6 + ripple * 0.4 + flow * 0.5) * 1.5;
-
-      positionAttribute.setZ(i, z);
+      // Calculs simplifiés sur mobile (2 vagues au lieu de 5)
+      if (this.isMobile) {
+        const wave1 = Math.sin(x * 0.4 + time * 1.2) * Math.cos(y * 0.3 + time * 0.9);
+        const wave2 = Math.sin(x * 0.6 + time * 0.7 + 2) * Math.sin(y * 0.4 + time * 1.1);
+        const z = (wave1 * 1.2 + wave2 * 0.8) * 1.5;
+        positionAttribute.setZ(i, z);
+      } else {
+        const wave1 = Math.sin(x * 0.4 + time * 1.2) * Math.cos(y * 0.3 + time * 0.9);
+        const wave2 = Math.sin(x * 0.6 + time * 0.7 + 2) * Math.sin(y * 0.4 + time * 1.1);
+        const wave3 = Math.cos(x * 0.35 + time * 0.5 - 1) * Math.cos(y * 0.55 + time * 0.8);
+        const ripple = Math.sin(Math.sqrt(x * x + y * y) * 0.5 - time * 1.5);
+        const flow = Math.sin(x * 0.25 + time) * Math.cos(y * 0.2 + time * 0.6);
+        const z = (wave1 * 1.2 + wave2 * 0.8 + wave3 * 0.6 + ripple * 0.4 + flow * 0.5) * 1.5;
+        positionAttribute.setZ(i, z);
+      }
     }
 
     positionAttribute.needsUpdate = true;
@@ -172,9 +203,11 @@ export class WaveScene {
     this.waveMesh.rotation.y = Math.cos(time * 0.25) * 0.15 + time * 0.05;
     this.waveMesh.rotation.z = Math.sin(time * 0.2) * 0.08;
 
-    // Mouse parallax interaction
-    this.waveMesh.rotation.x += this.mouse.y * 0.15;
-    this.waveMesh.rotation.y += this.mouse.x * 0.15;
+    // Mouse parallax interaction (desktop uniquement)
+    if (!this.isMobile) {
+      this.waveMesh.rotation.x += this.mouse.y * 0.15;
+      this.waveMesh.rotation.y += this.mouse.x * 0.15;
+    }
 
     this.renderer.render(this.scene, this.camera);
   };
