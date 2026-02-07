@@ -1,18 +1,68 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
+import { motion, useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
 import { EXPERTISE_DATA } from '../constants';
 import SkillCard from './SkillCard';
+
+// Hook personnalisé pour les animations de carte mobile (évite les hooks dans la boucle)
+const useMobileCardAnimations = (
+    smoothProgress: MotionValue<number>,
+    cardIndex: number
+) => {
+    const start = 0.15 + (cardIndex * 0.18);
+    const end = start + 0.22;
+
+    const mobY = useTransform(smoothProgress, [start, start + 0.08], [300, 0]);
+    const mobOp = useTransform(smoothProgress, [start, start + 0.05, end - 0.05, end], [0, 1, 1, 0]);
+    const mobScale = useTransform(smoothProgress, [start, start + 0.08], [0.85, 1]);
+    const mobExitY = useTransform(smoothProgress, [end - 0.08, end], [0, -200]);
+
+    return { mobY, mobOp, mobScale, mobExitY, zIndex: 50 - cardIndex };
+};
+
+// Composant pour carte mobile optimisé
+const MobileSkillCard: React.FC<{
+    item: typeof EXPERTISE_DATA[0];
+    smoothProgress: MotionValue<number>;
+    index: number;
+}> = React.memo(({ item, smoothProgress, index }) => {
+    const { mobY, mobOp, mobScale, mobExitY, zIndex } = useMobileCardAnimations(smoothProgress, index);
+
+    return (
+        <motion.div
+            style={{
+                y: mobY,
+                translateY: mobExitY,
+                opacity: mobOp,
+                scale: mobScale,
+                zIndex,
+                willChange: 'transform, opacity',
+            }}
+            className="absolute w-full max-w-[320px] gpu-accelerate"
+        >
+            <SkillCard item={item} />
+        </motion.div>
+    );
+});
+
+MobileSkillCard.displayName = 'MobileSkillCard';
 
 export const ExpertiseDeployment: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+    const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-        const handleResize = () => setWindowWidth(window.innerWidth);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        const checkMobile = () => {
+            const width = window.innerWidth;
+            setWindowWidth(width);
+            setIsMobile(width < 1024);
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
     const { scrollYProgress } = useScroll({
@@ -20,15 +70,18 @@ export const ExpertiseDeployment: React.FC = () => {
         offset: ["start start", "end end"]
     });
 
-    const smoothProgress = useSpring(scrollYProgress, {
-        stiffness: 70,
-        damping: 30,
-        restDelta: 0.001
-    });
+    // Spring avec paramètres optimisés pour mobile (plus réactif, moins de calculs)
+    const springConfig = useMemo(() => ({
+        stiffness: isMobile ? 100 : 70,
+        damping: isMobile ? 20 : 30,
+        restDelta: 0.001,
+        mass: isMobile ? 0.5 : 1
+    }), [isMobile]);
+
+    const smoothProgress = useSpring(scrollYProgress, springConfig);
 
     // --- ANIMATIONS DESKTOP (Déploiement en éventail centré) ---
-    // On utilise des pourcentages de la largeur de l'écran pour garantir le centrage
-    const spreadMultiplier = windowWidth < 1280 ? 28 : 32; // Ajustement selon la largeur
+    const spreadMultiplier = windowWidth < 1280 ? 28 : 32;
 
     const x1 = useTransform(smoothProgress, [0.1, 0.6], ["0vw", `-${spreadMultiplier / 1}vw`]);
     const x2 = useTransform(smoothProgress, [0.2, 0.6], ["0vw", `-${spreadMultiplier / 3}vw`]);
@@ -60,12 +113,29 @@ export const ExpertiseDeployment: React.FC = () => {
             ref={containerRef}
             className="relative h-[450vh] bg-background flex flex-col items-center"
         >
+            {/* CSS pour accélération GPU */}
+            <style jsx global>{`
+                .gpu-accelerate {
+                    transform: translateZ(0);
+                    backface-visibility: hidden;
+                    -webkit-backface-visibility: hidden;
+                    perspective: 1000px;
+                    -webkit-perspective: 1000px;
+                }
+                
+                @media (max-width: 1023px) {
+                    .expertise-card-container {
+                        transform: translate3d(0, 0, 0);
+                    }
+                }
+            `}</style>
+
             <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden">
 
                 {/* Titre en arrière-plan (centré) */}
                 <motion.h2
-                    style={{ opacity: bgOp, scale: bgScale }}
-                    className="absolute text-[22vw] font-black text-white whitespace-nowrap select-none uppercase tracking-tighter z-0 pointer-events-none"
+                    style={{ opacity: bgOp, scale: bgScale, willChange: 'transform, opacity' }}
+                    className="absolute text-[22vw] font-black text-white whitespace-nowrap select-none uppercase tracking-tighter z-0 pointer-events-none gpu-accelerate"
                 >
                     EXPERTISE
                 </motion.h2>
@@ -76,9 +146,10 @@ export const ExpertiseDeployment: React.FC = () => {
                         scale: centralScale,
                         opacity: centralOpacity,
                         y: centralY,
-                        zIndex: 100
+                        zIndex: 100,
+                        willChange: 'transform, opacity'
                     }}
-                    className="absolute flex flex-col items-center justify-center pointer-events-none"
+                    className="absolute flex flex-col items-center justify-center pointer-events-none gpu-accelerate"
                 >
                     <div className="w-[300px] h-[450px] bg-white rounded-[3rem] shadow-[0_0_100px_rgba(184,206,32,0.2)] flex flex-col items-center justify-center p-8 border-[10px] border-secondaire">
                         <span className="text-background font-black text-sm mb-4 tracking-[0.5em] uppercase">Nos</span>
@@ -91,7 +162,7 @@ export const ExpertiseDeployment: React.FC = () => {
                     </div>
                     <motion.div
                         animate={{ y: [0, 10, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                         className="mt-10 flex flex-col items-center gap-3"
                     >
                         <span className="text-secondaire font-black tracking-[0.3em] text-[10px] uppercase">Scrollez pour déployer</span>
@@ -101,52 +172,30 @@ export const ExpertiseDeployment: React.FC = () => {
 
                 {/* Mise en page Desktop : Déploiement horizontal centré */}
                 <div className="hidden lg:block relative w-full h-full">
-                    <motion.div style={{ x: x1, opacity: op1, rotate: r1 }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] xl:w-[320px]">
+                    <motion.div style={{ x: x1, opacity: op1, rotate: r1, willChange: 'transform, opacity' }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] xl:w-[320px] gpu-accelerate">
                         <SkillCard item={EXPERTISE_DATA[0]} />
                     </motion.div>
-                    <motion.div style={{ x: x2, opacity: op2, rotate: r2 }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] xl:w-[320px]">
+                    <motion.div style={{ x: x2, opacity: op2, rotate: r2, willChange: 'transform, opacity' }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] xl:w-[320px] gpu-accelerate">
                         <SkillCard item={EXPERTISE_DATA[1]} />
                     </motion.div>
-                    <motion.div style={{ x: x3, opacity: op3, rotate: r3 }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] xl:w-[320px]">
+                    <motion.div style={{ x: x3, opacity: op3, rotate: r3, willChange: 'transform, opacity' }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] xl:w-[320px] gpu-accelerate">
                         <SkillCard item={EXPERTISE_DATA[2]} />
                     </motion.div>
-                    <motion.div style={{ x: x4, opacity: op4, rotate: r4 }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] xl:w-[320px]">
+                    <motion.div style={{ x: x4, opacity: op4, rotate: r4, willChange: 'transform, opacity' }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] xl:w-[320px] gpu-accelerate">
                         <SkillCard item={EXPERTISE_DATA[3]} />
                     </motion.div>
                 </div>
 
-                {/* Mise en page Mobile : Les cartes à la suite (séquentiel) */}
-                <div className="lg:hidden w-full h-full flex flex-col items-center justify-center relative px-8">
-                    {EXPERTISE_DATA.map((item, idx) => {
-                        // Séquence : chaque carte a sa fenêtre de visibilité
-                        const start = 0.15 + (idx * 0.18);
-                        const end = start + 0.22;
-
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        const mobY = useTransform(smoothProgress, [start, start + 0.08], [300, 0]);
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        const mobOp = useTransform(smoothProgress, [start, start + 0.05, end - 0.05, end], [0, 1, 1, 0]);
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        const mobScale = useTransform(smoothProgress, [start, start + 0.08], [0.8, 1]);
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        const mobExitY = useTransform(smoothProgress, [end - 0.08, end], [0, -200]);
-
-                        return (
-                            <motion.div
-                                key={item.id}
-                                style={{
-                                    y: mobY,
-                                    translateY: mobExitY,
-                                    opacity: mobOp,
-                                    scale: mobScale,
-                                    zIndex: 50 - idx,
-                                }}
-                                className="absolute w-full max-w-[320px]"
-                            >
-                                <SkillCard item={item} />
-                            </motion.div>
-                        );
-                    })}
+                {/* Mise en page Mobile : Les cartes à la suite (séquentiel) - OPTIMISÉ */}
+                <div className="lg:hidden w-full h-full flex flex-col items-center justify-center relative px-8 expertise-card-container">
+                    {EXPERTISE_DATA.map((item, idx) => (
+                        <MobileSkillCard
+                            key={item.id}
+                            item={item}
+                            smoothProgress={smoothProgress}
+                            index={idx}
+                        />
+                    ))}
                 </div>
             </div>
         </section>
