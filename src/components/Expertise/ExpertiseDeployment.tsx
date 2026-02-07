@@ -11,27 +11,52 @@ export const ExpertiseDeployment: React.FC = () => {
     const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
     const { isMobile, shouldReduceAnimations } = useDevicePerformance();
 
+    // État pour animation CSS mobile
+    const [scrollProgress, setScrollProgress] = useState(0);
+
     useEffect(() => {
         const handleResize = () => setWindowWidth(window.innerWidth);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Scroll listener simplifié pour mobile (CSS animations)
+    useEffect(() => {
+        if (!shouldReduceAnimations || !containerRef.current) return;
+
+        const handleScroll = () => {
+            if (!containerRef.current) return;
+            const rect = containerRef.current.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            const sectionHeight = containerRef.current.offsetHeight;
+
+            // Calcul du progress (0 à 1)
+            const scrolled = -rect.top;
+            const total = sectionHeight - viewportHeight;
+            const progress = Math.max(0, Math.min(1, scrolled / total));
+
+            setScrollProgress(progress);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll(); // Initial call
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [shouldReduceAnimations]);
+
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start start", "end end"]
     });
 
-    // Spring plus léger sur mobile pour réduire les calculs
     const smoothProgress = useSpring(scrollYProgress, {
-        stiffness: shouldReduceAnimations ? 200 : 70,
-        damping: shouldReduceAnimations ? 50 : 30,
-        restDelta: shouldReduceAnimations ? 0.01 : 0.001
+        stiffness: 70,
+        damping: 30,
+        restDelta: 0.001
     });
 
     // --- ANIMATIONS DESKTOP (Déploiement en éventail centré) ---
-    // On utilise des pourcentages de la largeur de l'écran pour garantir le centrage
-    const spreadMultiplier = windowWidth < 1280 ? 28 : 32; // Ajustement selon la largeur
+    const spreadMultiplier = windowWidth < 1280 ? 28 : 32;
 
     const x1 = useTransform(smoothProgress, [0.1, 0.6], ["0vw", `-${spreadMultiplier / 1}vw`]);
     const x2 = useTransform(smoothProgress, [0.2, 0.6], ["0vw", `-${spreadMultiplier / 3}vw`]);
@@ -48,16 +73,111 @@ export const ExpertiseDeployment: React.FC = () => {
     const op3 = useTransform(smoothProgress, [0.3, 0.5], [0, 1]);
     const op4 = useTransform(smoothProgress, [0.4, 0.6], [0, 1]);
 
-    // Cover Card - animations simplifiées sur mobile (utilise scrollYProgress direct)
-    const coverProgress = shouldReduceAnimations ? scrollYProgress : smoothProgress;
-    const centralScale = useTransform(coverProgress, [0, 0.2], [1, shouldReduceAnimations ? 0.5 : 0.3]);
-    const centralOpacity = useTransform(coverProgress, [0, 0.15], [1, 0]);
-    const centralY = useTransform(coverProgress, [0, 0.2], [0, shouldReduceAnimations ? -100 : -250]);
+    // Cover Card (Desktop uniquement avec Framer Motion)
+    const centralScale = useTransform(smoothProgress, [0, 0.2], [1, 0.3]);
+    const centralOpacity = useTransform(smoothProgress, [0, 0.15], [1, 0]);
+    const centralY = useTransform(smoothProgress, [0, 0.2], [0, -250]);
 
     // Background Title
     const bgScale = useTransform(smoothProgress, [0, 1], [0.9, 1.1]);
     const bgOp = useTransform(smoothProgress, [0, 0.5], [0, 0.1]);
 
+    // Calculs CSS pour mobile (pure CSS transitions)
+    const getCoverStyle = () => {
+        const opacity = Math.max(0, 1 - scrollProgress * 6);
+        const scale = 1 - scrollProgress * 2.5;
+        const translateY = scrollProgress * -150;
+        return {
+            opacity,
+            transform: `scale(${Math.max(0.3, scale)}) translateY(${translateY}px)`,
+        };
+    };
+
+    const getCardStyle = (index: number) => {
+        const start = 0.15 + (index * 0.18);
+        const end = start + 0.22;
+
+        // Calcul de la visibilité
+        let opacity = 0;
+        if (scrollProgress >= start && scrollProgress <= end) {
+            const fadeIn = Math.min(1, (scrollProgress - start) / 0.05);
+            const fadeOut = Math.min(1, (end - scrollProgress) / 0.05);
+            opacity = Math.min(fadeIn, fadeOut);
+        }
+
+        // Calcul du scale
+        const scaleProgress = Math.min(1, (scrollProgress - start) / 0.08);
+        const scale = 0.8 + (scaleProgress * 0.2);
+
+        // Calcul du Y
+        const yIn = Math.max(0, 300 - (scrollProgress - start) * 3750);
+        const yOut = scrollProgress > (end - 0.08) ? (scrollProgress - (end - 0.08)) * 2500 : 0;
+
+        return {
+            opacity,
+            transform: `scale(${scale}) translateY(${yIn - yOut}px)`,
+            zIndex: 50 - index,
+        };
+    };
+
+    // ========== VERSION MOBILE PURE CSS ==========
+    if (shouldReduceAnimations) {
+        return (
+            <section
+                id="expertise"
+                ref={containerRef}
+                className="relative h-[450vh] bg-background flex flex-col items-center"
+            >
+                <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden">
+                    {/* Carte de couverture - CSS Pure */}
+                    <div
+                        style={{
+                            ...getCoverStyle(),
+                            transition: 'none', // Pas de transition pour réactivité maximale
+                            willChange: 'transform, opacity',
+                        }}
+                        className="absolute flex flex-col items-center justify-center pointer-events-none z-[100]"
+                    >
+                        <div className="w-[300px] h-[450px] bg-white rounded-[3rem] shadow-[0_0_100px_rgba(184,206,32,0.2)] flex flex-col items-center justify-center p-8 border-[10px] border-secondaire">
+                            <span className="text-background font-black text-sm mb-4 tracking-[0.5em] uppercase">Nos</span>
+                            <h3 className="text-background font-black text-7xl tracking-tighter leading-none">SKILLS</h3>
+                            <div className="mt-12 flex gap-3">
+                                <div className="w-3 h-3 rounded-full bg-secondaire" />
+                                <div className="w-3 h-3 rounded-full bg-principale" />
+                                <div className="w-3 h-3 rounded-full bg-background" />
+                            </div>
+                        </div>
+                        <div className="mt-10 flex flex-col items-center gap-3">
+                            <span className="text-secondaire font-black tracking-[0.3em] text-[10px] uppercase">Scrollez pour déployer</span>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-secondaire">
+                                <path d="M12 4L12 20M12 20L6 14M12 20L18 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            <div className="w-px h-16 bg-gradient-to-b from-secondaire to-transparent" />
+                        </div>
+                    </div>
+
+                    {/* Skill Cards - CSS Pure */}
+                    <div className="w-full h-full flex flex-col items-center justify-center relative px-8">
+                        {EXPERTISE_DATA.map((item, idx) => (
+                            <div
+                                key={item.id}
+                                style={{
+                                    ...getCardStyle(idx),
+                                    transition: 'none',
+                                    willChange: 'transform, opacity',
+                                }}
+                                className="absolute w-full max-w-[320px]"
+                            >
+                                <SkillCard item={item} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    // ========== VERSION DESKTOP FRAMER MOTION ==========
     return (
         <section
             id="expertise"
@@ -66,25 +186,21 @@ export const ExpertiseDeployment: React.FC = () => {
         >
             <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden">
 
-                {/* Titre en arrière-plan (centré) - caché sur mobile pour perf */}
-                {!shouldReduceAnimations && (
-                    <motion.h2
-                        style={{ opacity: bgOp, scale: bgScale }}
-                        className="absolute text-[22vw] font-black text-white whitespace-nowrap select-none uppercase tracking-tighter z-0 pointer-events-none"
-                    >
-                        EXPERTISE
-                    </motion.h2>
-                )}
+                {/* Titre en arrière-plan (centré) */}
+                <motion.h2
+                    style={{ opacity: bgOp, scale: bgScale }}
+                    className="absolute text-[22vw] font-black text-white whitespace-nowrap select-none uppercase tracking-tighter z-0 pointer-events-none"
+                >
+                    EXPERTISE
+                </motion.h2>
 
-                {/* Carte de couverture (Initialement centrée) */}
+                {/* Carte de couverture */}
                 <motion.div
                     style={{
                         scale: centralScale,
                         opacity: centralOpacity,
                         y: centralY,
-                        zIndex: 100,
-                        // GPU acceleration hint
-                        willChange: shouldReduceAnimations ? 'auto' : 'transform, opacity'
+                        zIndex: 100
                     }}
                     className="absolute flex flex-col items-center justify-center pointer-events-none"
                 >
@@ -97,34 +213,23 @@ export const ExpertiseDeployment: React.FC = () => {
                             <div className="w-3 h-3 rounded-full bg-background" />
                         </div>
                     </div>
-                    {/* Animations de flèche désactivées sur mobile */}
-                    {shouldReduceAnimations ? (
-                        <div className="mt-10 flex flex-col items-center gap-3">
-                            <span className="text-secondaire font-black tracking-[0.3em] text-[10px] uppercase">Scrollez pour déployer</span>
+                    <motion.div
+                        animate={{ y: [0, 10, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="mt-10 flex flex-col items-center gap-3"
+                    >
+                        <span className="text-secondaire font-black tracking-[0.3em] text-[10px] uppercase">Scrollez pour déployer</span>
+                        <motion.div
+                            animate={{ y: [0, 8, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                            className="flex flex-col items-center"
+                        >
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-secondaire">
                                 <path d="M12 4L12 20M12 20L6 14M12 20L18 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
-                            <div className="w-px h-16 bg-gradient-to-b from-secondaire to-transparent" />
-                        </div>
-                    ) : (
-                        <motion.div
-                            animate={{ y: [0, 10, 0] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className="mt-10 flex flex-col items-center gap-3"
-                        >
-                            <span className="text-secondaire font-black tracking-[0.3em] text-[10px] uppercase">Scrollez pour déployer</span>
-                            <motion.div
-                                animate={{ y: [0, 8, 0] }}
-                                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                                className="flex flex-col items-center"
-                            >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-secondaire">
-                                    <path d="M12 4L12 20M12 20L6 14M12 20L18 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </motion.div>
-                            <div className="w-px h-16 bg-gradient-to-b from-secondaire to-transparent" />
                         </motion.div>
-                    )}
+                        <div className="w-px h-16 bg-gradient-to-b from-secondaire to-transparent" />
+                    </motion.div>
                 </motion.div>
 
                 {/* Mise en page Desktop : Déploiement horizontal centré */}
@@ -143,39 +248,8 @@ export const ExpertiseDeployment: React.FC = () => {
                     </motion.div>
                 </div>
 
-                {/* Mise en page Mobile : Les cartes à la suite (séquentiel) */}
-                <div className="lg:hidden w-full h-full flex flex-col items-center justify-center relative px-8">
-                    {EXPERTISE_DATA.map((item, idx) => {
-                        // Séquence : chaque carte a sa fenêtre de visibilité
-                        const start = 0.15 + (idx * 0.18);
-                        const end = start + 0.22;
-
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        const mobY = useTransform(smoothProgress, [start, start + 0.08], [300, 0]);
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        const mobOp = useTransform(smoothProgress, [start, start + 0.05, end - 0.05, end], [0, 1, 1, 0]);
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        const mobScale = useTransform(smoothProgress, [start, start + 0.08], [0.8, 1]);
-                        // eslint-disable-next-line react-hooks/rules-of-hooks
-                        const mobExitY = useTransform(smoothProgress, [end - 0.08, end], [0, -200]);
-
-                        return (
-                            <motion.div
-                                key={item.id}
-                                style={{
-                                    y: mobY,
-                                    translateY: mobExitY,
-                                    opacity: mobOp,
-                                    scale: mobScale,
-                                    zIndex: 50 - idx,
-                                }}
-                                className="absolute w-full max-w-[320px]"
-                            >
-                                <SkillCard item={item} />
-                            </motion.div>
-                        );
-                    })}
-                </div>
+                {/* Mobile - masqué car géré séparément */}
+                <div className="lg:hidden" />
             </div>
         </section>
     );
