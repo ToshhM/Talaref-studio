@@ -46,18 +46,18 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     id: '2',
-    title: 'Coriane - Refonte',
-    slug: 'coriane-site-web',
-    description: 'Proposition d\'une nouvelle identité pour le site web de Coriane une ESN parisienne',
+    title: 'ciorane - Refonte',
+    slug: 'ciorane-site-web',
+    description: 'Proposition d\'une nouvelle identité pour le site web de Ciorane une ESN parisienne',
     content: `
     <div class="flex justify-center my-8">
           <a href="https://ciorane-website.vercel.app/" target="_blank" rel="noopener noreferrer" style="background-color: #3d4f35; border: 2px solid #c8ff00; color: #c8ff00;" class="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-full hover:opacity-90 transition-all duration-300 uppercase tracking-wider">Voir le site web</a>
         </div>
       <div class="prose prose-invert">
-        <p class="text-xl text-gray-300 leading-relaxed">Refonte complète du site web de Coriane, une ESN parisienne spécialisée dans le recrutement IT. L'objectif : moderniser l'image de marque et créer une plateforme performante pour connecter talents et entreprises.</p>
+        <p class="text-xl text-gray-300 leading-relaxed">Refonte complète du site web de Ciorane, une ESN parisienne spécialisée dans le recrutement IT. L'objectif : moderniser l'image de marque et créer une plateforme performante pour connecter talents et entreprises.</p>
 
         <h2 class="text-3xl font-black mt-12 mb-6">Le Défi</h2>
-        <p class="text-gray-300">Coriane avait besoin d'un site capable de gérer deux audiences distinctes : les candidats à la recherche d'opportunités et les entreprises en quête de talents. Il fallait créer une expérience fluide pour chacun tout en intégrant un job board complet.</p>
+        <p class="text-gray-300">Ciorane avait besoin d'un site capable de gérer deux audiences distinctes : les candidats à la recherche d'opportunités et les entreprises en quête de talents. Il fallait créer une expérience fluide pour chacun tout en intégrant un job board complet.</p>
 
         <h2 class="text-3xl font-black mt-12 mb-6">Processus Créatif</h2>
         <p class="text-gray-300 mb-6">Nous avons débuté par une phase approfondie de design thinking et d'analyse de l'existant pour comprendre les besoins des utilisateurs.(voir ci-dessous, l'existante)</p>
@@ -108,7 +108,7 @@ export const PROJECTS_DATA: Project[] = [
     category: 'Web',
     tags: ['Site web', 'Refonte', 'UX/UI', 'Job board'],
     technologies: ['React', 'NextJs', 'Supabase', 'Tailwind CSS', 'TypeScript', 'Figma'],
-    client: 'Coriane',
+    client: 'Ciorane',
     project_date: '2026-01-25',
     featured_image: '/images/projects/coriane/coriane.png',
     images: [
@@ -158,45 +158,7 @@ export const PROJECTS_DATA: Project[] = [
     created_at: new Date('2024-10-05').toISOString(),
     updated_at: new Date('2024-10-05').toISOString(),
   },
-  {
-    id: '4',
-    title: 'Application Mobile Fitness',
-    slug: 'application-mobile-fitness',
-    description: 'Application mobile de coaching sportif avec suivi personnalisé et plans d\'entraînement adaptatifs.',
-    content: `
-      <div class="prose prose-invert">
-        <p class="text-xl">Développement iOS et Android d'une application fitness complète avec backend temps réel. Interface intuitive et gamification pour motiver les utilisateurs à atteindre leurs objectifs.</p>
 
-        <h2 class="text-3xl font-black mt-12 mb-6">Fonctionnalités Clés</h2>
-        <ul class="space-y-3">
-          <li>💪 Plans d'entraînement personnalisés par IA</li>
-          <li>📊 Tracking en temps réel des performances</li>
-          <li>🏆 Système de badges et achievements</li>
-          <li>👥 Communauté et défis entre amis</li>
-          <li>📱 Synchronisation multi-appareils</li>
-          <li>🎯 Objectifs SMART et rappels intelligents</li>
-        </ul>
-
-        <h2 class="text-3xl font-black mt-12 mb-6">Stack Technique</h2>
-        <p>Nous avons choisi React Native avec Expo pour garantir une expérience native sur iOS et Android tout en partageant le maximum de code. Firebase gère l'authentification et la base de données en temps réel.</p>
-      </div>
-    `,
-    category: 'Projects',
-    tags: ['Mobile', 'Fitness', 'Health', 'React Native'],
-    technologies: ['React Native', 'Expo', 'Firebase', 'TypeScript', 'Redux Toolkit'],
-    client: 'FitLife App Inc',
-    project_date: '2024-09-12',
-    featured_image: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=800&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1434682881908-b43d0467b798?w=1200&h=800&fit=crop',
-    ],
-    featured: true,
-    published: true,
-    order_index: 4,
-    created_at: new Date('2024-09-12').toISOString(),
-    updated_at: new Date('2024-09-12').toISOString(),
-  },
   {
     id: '5',
     title: 'FootFactory',
@@ -268,35 +230,77 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     id: '7',
-    title: 'Refonte UI/UX App Bancaire',
-    slug: 'refonte-ui-ux-app-bancaire',
-    description: 'Redesign complet de l\'interface d\'une application bancaire mobile pour améliorer l\'UX et l\'accessibilité.',
+    title: 'Application mobile - Soon+',
+    slug: 'soon-application-mobile',
+    description: 'Création d\'une application mobile IOS, qui compte les jours avant un evenement',
     content: `
       <div class="prose prose-invert">
-        <p class="text-xl">Refonte totale de l'expérience utilisateur d'une application bancaire utilisée par plus de 100 000 clients. L'objectif était de simplifier les parcours tout en respectant les contraintes réglementaires strictes du secteur financier.</p>
+        <p class="text-xl">Le but de l'application est simpliste je voulais créer cette application à l'aide du vibe coding pour comprendre
+        comment avec l'ia on peut réaliser des applications pour pouvoir proposer ce genre de service et des clients potentiels</p>
 
-        <h2 class="text-3xl font-black mt-12 mb-6">Recherche Utilisateur</h2>
-        <p>Nous avons conduit 45 interviews utilisateurs et analysé plus de 10 000 sessions analytics pour identifier les points de friction majeurs. Ces insights ont guidé toutes nos décisions de design.</p>
+        <h2 class="text-3xl font-black mt-12 mb-6">L'idée</h2>
+        <p>L'idée de l'application est simpliste j'avais vu su twwitter que des applications de compteur de jouer avzant Noel arrivait à générer des fonds j'ai donc voulu faire ma propre version  en essayant d'aller bien plus
+        loin en créant plusieurs événement types nouvel an halloween, le black friday. Mais aussi de proposer à des utilisateurs de créer leurs propres événements. Le côté innovant c'est la partie personnalisation de l'application, une fois l'évènement créer on peut l'on faire un widget disponible sur l'écran d'accueil </p>
 
-        <h2 class="text-3xl font-black mt-12 mb-6">Résultats Mesurables</h2>
+        <h2 class="text-3xl font-black mt-12 mb-6">La suite </h2>
         <ul class="space-y-3">
-          <li>📈 +45% de satisfaction utilisateur (NPS)</li>
-          <li>⚡ -60% de temps pour effectuer un virement</li>
-          <li>✅ +30% d'utilisateurs actifs mensuels</li>
-          <li>♿ Conformité WCAG 2.1 niveau AA</li>
+          <li>Etape 1 : Finaliser la partie paiement. En effet l'application est gratuite mais il y a des fonctionnalités payantes le nombre de création d'événement est limité à 3. Il faut aussi payer pour pouvoir ajouter des images à ses widgets personnalisés sur son écran d'accueil.</li>
+          <li>Etape 2 : Publication de l'application sur Apple Store </li>
+          <li>Etape 3 : Marketer l'application et générer des ventes (ce sera la partie la plus dure car je ne suis pas un marketeux dans l'âme)</li>
+          <li>Etape 4 : Retour utilisateurs et amélioration de l'application</li>
         </ul>
       </div>
     `,
-    category: 'Design',
-    tags: ['UX/UI', 'Mobile', 'Fintech', 'Accessibilité'],
-    technologies: ['Figma', 'Principle', 'UserTesting', 'Hotjar', 'Maze'],
-    client: 'BankTech Solutions',
-    project_date: '2024-06-22',
-    featured_image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&h=800&fit=crop',
+    category: 'Web',
+    tags: ['UX/UI', 'Mobile', 'IOS', 'Compteur'],
+    technologies: ['Figma', 'React Native',],
+    client: 'Freelance',
+    project_date: '2026-01-25',
+    featured_image: 'http://www.image-heberg.fr/files/17701265441175889774.png',
     images: [
-      'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1200&h=800&fit=crop',
+      'https://www.image-heberg.fr/files/17701263154169769775.jpg',
+      'https://www.image-heberg.fr/files/1770126329308773760.jpg',
+      'http://www.image-heberg.fr/files/17701266561175889774.jpg',
+      'https://www.image-heberg.fr/files/17701263743907343931.jpg',
     ],
+    featured: false,
+    published: true,
+    order_index: 7,
+    created_at: new Date('2024-06-22').toISOString(),
+    updated_at: new Date('2024-06-22').toISOString(),
+  },
+  {
+    id: '8',
+    title: 'Nzo Studio Prod refonte',
+    slug: 'nzo-studio-prod-refonte',
+    description: 'Refonte du site web de Nzo Studio Prod',
+    content: `
+    <div class="flex justify-center my-8">
+          <a href="https://nzo-studio-prod.vercel.app/" target="_blank" rel="noopener noreferrer" style="background-color: #3d4f35; border: 2px solid #c8ff00; color: #c8ff00;" class="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-full hover:opacity-90 transition-all duration-300 uppercase tracking-wider">Voir le site web</a>
+        </div>
+     <div class="prose prose-invert">
+  <p class="text-xl">
+    Dans la continuité de son évolution, N’zo Prod a récemment fait l’objet d’une seconde refonte complète de son site web.
+    L’objectif était d’affirmer plus clairement l’identité de l’agence tout en proposant une expérience plus immersive
+    et plus fluide. Cette nouvelle version met en lumière l’univers événementiel B2B de N’zo Prod, son positionnement
+    “sérieux sans se prendre au sérieux”, ainsi que l’ensemble de ses expertises : événements corporate, production
+    audiovisuelle, studio photo ouvert au public, formation et coaching en communication. Le site s’appuie désormais
+    sur un design plus moderne, une structure plus claire et un nouveau showreel pensé comme une véritable immersion
+    dans les productions, les événements de gala et les projets créatifs de l’agence.
+  </p>
+</div>
+    `,
+    category: 'Web',
+    tags: ['WEB', 'REFONTE', 'UX/UI',],
+    technologies: ['Figma', 'React', 'Vercel'],
+    client: 'NZO PROD',
+    project_date: '2026-02-04',
+    featured_image: 'http://www.image-heberg.fr/files/17701726452507479635.png',
+    images: [
+      'http://www.image-heberg.fr/files/17701727414030467405.png',
+      'http://www.image-heberg.fr/files/1770173067542683382.png',
+      'https://www.image-heberg.fr/files/17701729112165786397.png',
+     ],
     featured: false,
     published: true,
     order_index: 7,

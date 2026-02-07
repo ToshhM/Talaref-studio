@@ -95,7 +95,29 @@ export const ExpertiseDeployment: React.FC = () => {
                         className="mt-10 flex flex-col items-center gap-3"
                     >
                         <span className="text-secondaire font-black tracking-[0.3em] text-[10px] uppercase">Scrollez pour déployer</span>
-                        <div className="w-px h-20 bg-gradient-to-b from-secondaire to-transparent" />
+                        {/* Flèche animée vers le bas */}
+                        <motion.div
+                            animate={{ y: [0, 8, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                            className="flex flex-col items-center"
+                        >
+                            <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                className="text-secondaire"
+                            >
+                                <path
+                                    d="M12 4L12 20M12 20L6 14M12 20L18 14"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </motion.div>
+                        <div className="w-px h-16 bg-gradient-to-b from-secondaire to-transparent" />
                     </motion.div>
                 </motion.div>
 

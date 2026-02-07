@@ -16,7 +16,7 @@ export interface Database {
           slug: string
           description: string
           content: string | null
-          category: 'Photo' | 'Web' | 'Design' | 'Projects'
+          category: 'Photo' | 'Web' | 'Design' | 'Projects' | 'Application mobile'
           tags: string[]
           technologies: string[]
           client: string | null
@@ -35,7 +35,7 @@ export interface Database {
           slug: string
           description: string
           content?: string | null
-          category: 'Photo' | 'Web' | 'Design' | 'Projects'
+          category: 'Photo' | 'Web' | 'Design' | 'Projects' | 'Application mobile'
           tags?: string[]
           technologies?: string[]
           client?: string | null
@@ -54,7 +54,7 @@ export interface Database {
           slug?: string
           description?: string
           content?: string | null
-          category?: 'Photo' | 'Web' | 'Design' | 'Projects'
+          category?: 'Photo' | 'Web' | 'Design' | 'Projects' | 'Application mobile'
           tags?: string[]
           technologies?: string[]
           client?: string | null

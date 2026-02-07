@@ -43,9 +43,9 @@ export default function Header() {
             </nav>
 
             <div className="hidden md:block">
-                <button className="bg-white/10 hover:bg-secondaire hover:text-background text-white px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest transition-all transform hover:scale-105 active:scale-95 border border-white/10 hover:border-secondaire">
+                <a href="/#contact" className="bg-white/10 hover:bg-secondaire hover:text-background text-white px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest transition-all transform hover:scale-105 active:scale-95 border border-white/10 hover:border-secondaire">
                     Start Project
-                </button>
+                </a>
             </div>
 
             {/* Mobile Menu Button */}
@@ -79,9 +79,9 @@ export default function Header() {
                                 {item.label}
                             </a>
                         ))}
-                        <button className="bg-secondaire text-background px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest mt-4">
+                        <a href="/#contact" className="bg-secondaire text-background px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest mt-4 block text-center" onClick={() => setIsMobileMenuOpen(false)}>
                             Start Project
-                        </button>
+                        </a>
                     </motion.div>
                 )}
             </AnimatePresence>

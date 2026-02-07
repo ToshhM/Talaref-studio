@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { WaveScene } from '@/utils/threeScene';
 
 export function WaveBanner() {
@@ -61,7 +62,7 @@ export function WaveBanner() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button className="group relative px-8 py-4 overflow-hidden rounded-lg transition-all duration-500 hover:scale-105 hover:shadow-[0_0_50px_rgba(184,207,32,0.4)]">
+            <Link href="/portfolio" className="group relative px-8 py-4 overflow-hidden rounded-lg transition-all duration-500 hover:scale-105 hover:shadow-[0_0_50px_rgba(184,207,32,0.4)]">
               <div className="absolute inset-0 bg-gradient-to-r from-[#B8CF20] to-[#a3b81d]" />
               <span className="relative flex items-center gap-2 text-[#001829] font-bold text-sm tracking-wide">
                 Découvrir nos services
@@ -69,7 +70,7 @@ export function WaveBanner() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
-            </button>
+            </Link>
 
             <button className="group relative px-8 py-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg text-white font-semibold text-sm tracking-wide transition-all duration-500 hover:scale-105 hover:bg-white/10 hover:border-white/20">
               Nos réalisations
