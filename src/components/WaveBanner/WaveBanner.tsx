@@ -44,9 +44,12 @@ export function WaveBanner() {
         />
       )}
 
-      {/* Fond alternatif pour mobile - Gradient animé CSS */}
+      {/* Image de fond pour mobile - Plein écran */}
       {isMobile && (
-        <div className="absolute inset-0 bg-gradient-to-br from-[#001829] via-[#003a5c] to-[#001829] animate-gradient-shift" />
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/images/hero-mobile-bg.png')" }}
+        />
       )}
 
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60 z-[1]" />
