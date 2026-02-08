@@ -66,7 +66,7 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
     whileTap: { scale: 0.98 }
   } : {
     // Desktop: animations complètes
-    transition: { type: "spring", stiffness: 400, damping: 40 },
+    transition: { type: "spring" as const, stiffness: 400, damping: 40 },
     whileHover: {
       scale: 1.05,
       z: 50,
