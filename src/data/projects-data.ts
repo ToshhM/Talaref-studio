@@ -160,36 +160,38 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     id: '4',
-    title: 'Application Mobile Fitness',
-    slug: 'application-mobile-fitness',
-    description: 'Application mobile de coaching sportif avec suivi personnalisé et plans d\'entraînement adaptatifs.',
+    title: 'Soon+',
+    slug: 'soon',
+    description: 'Application mobile compteur de jour pour vos évènéments',
     content: `
       <div class="prose prose-invert">
-        <p class="text-xl">Développement iOS et Android d'une application fitness complète avec backend temps réel. Interface intuitive et gamification pour motiver les utilisateurs à atteindre leurs objectifs.</p>
+        <p class="text-xl">Développement iOS et Android d'une application compteur de jour pour vos évènéments.</p>
 
         <h2 class="text-3xl font-black mt-12 mb-6">Fonctionnalités Clés</h2>
         <ul class="space-y-3">
-          <li>💪 Plans d'entraînement personnalisés par IA</li>
-          <li>📊 Tracking en temps réel des performances</li>
-          <li>🏆 Système de badges et achievements</li>
-          <li>👥 Communauté et défis entre amis</li>
-          <li>📱 Synchronisation multi-appareils</li>
-          <li>🎯 Objectifs SMART et rappels intelligents</li>
+          <li>Vous pouvez personalisé vos évènements avec des couleurs et des images voir mêmes des vidéos</li>
+          <li>📊 Vous pouvez voir le nombre de jours restants avant votre évènement</li>
+          <li>🏆 Vous pouvez ajouter des widgets sur votre écran d'accueil pour voir le nombre de jours restants avant votre évènement</li>
+          <li>👥 Vous psouvez partager vos évènements avec vos amis</li>
+          <li>📱 Synchronisation multi-appareil</li>
+          <li>🎯 Widget sur écran de verouillage</li>
         </ul>
 
         <h2 class="text-3xl font-black mt-12 mb-6">Stack Technique</h2>
-        <p>Nous avons choisi React Native avec Expo pour garantir une expérience native sur iOS et Android tout en partageant le maximum de code. Firebase gère l'authentification et la base de données en temps réel.</p>
+        <p>Nous avons choisi React Native avec Expo pour garantir une expérience native sur iOS et Android tout en partageant le maximum de code.</p>
       </div>
     `,
     category: 'Projects',
-    tags: ['Mobile', 'Fitness', 'Health', 'React Native'],
-    technologies: ['React Native', 'Expo', 'Firebase', 'TypeScript', 'Redux Toolkit'],
-    client: 'FitLife App Inc',
-    project_date: '2024-09-12',
-    featured_image: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=800&fit=crop',
+    tags: ['Mobile', 'Bien-être', 'Productivité', 'React Native'],
+    technologies: ['React Native', 'Expo', 'TypeScript',],
+    client: 'Freelance',
+    project_date: '2025-11-12',
+    featured_image: 'https://www.image-heberg.fr/files/17701265441175889774.png',
     images: [
-      'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1434682881908-b43d0467b798?w=1200&h=800&fit=crop',
+      'https://www.image-heberg.fr/files/17701263154169769775.jpg',
+      'https://www.image-heberg.fr/files/1770126329308773760.jpg',
+      'https://www.image-heberg.fr/files/17701263383292690892.jpg',
+      'https://www.image-heberg.fr/files/17701266472528350891.jpg',
     ],
     featured: true,
     published: true,
@@ -265,42 +267,5 @@ export const PROJECTS_DATA: Project[] = [
     order_index: 6,
     created_at: new Date('2024-07-18').toISOString(),
     updated_at: new Date('2024-07-18').toISOString(),
-  },
-  {
-    id: '7',
-    title: 'Refonte UI/UX App Bancaire',
-    slug: 'refonte-ui-ux-app-bancaire',
-    description: 'Redesign complet de l\'interface d\'une application bancaire mobile pour améliorer l\'UX et l\'accessibilité.',
-    content: `
-      <div class="prose prose-invert">
-        <p class="text-xl">Refonte totale de l'expérience utilisateur d'une application bancaire utilisée par plus de 100 000 clients. L'objectif était de simplifier les parcours tout en respectant les contraintes réglementaires strictes du secteur financier.</p>
-
-        <h2 class="text-3xl font-black mt-12 mb-6">Recherche Utilisateur</h2>
-        <p>Nous avons conduit 45 interviews utilisateurs et analysé plus de 10 000 sessions analytics pour identifier les points de friction majeurs. Ces insights ont guidé toutes nos décisions de design.</p>
-
-        <h2 class="text-3xl font-black mt-12 mb-6">Résultats Mesurables</h2>
-        <ul class="space-y-3">
-          <li>📈 +45% de satisfaction utilisateur (NPS)</li>
-          <li>⚡ -60% de temps pour effectuer un virement</li>
-          <li>✅ +30% d'utilisateurs actifs mensuels</li>
-          <li>♿ Conformité WCAG 2.1 niveau AA</li>
-        </ul>
-      </div>
-    `,
-    category: 'Design',
-    tags: ['UX/UI', 'Mobile', 'Fintech', 'Accessibilité'],
-    technologies: ['Figma', 'Principle', 'UserTesting', 'Hotjar', 'Maze'],
-    client: 'BankTech Solutions',
-    project_date: '2024-06-22',
-    featured_image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&h=800&fit=crop',
-    images: [
-      'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1200&h=800&fit=crop',
-    ],
-    featured: false,
-    published: true,
-    order_index: 7,
-    created_at: new Date('2024-06-22').toISOString(),
-    updated_at: new Date('2024-06-22').toISOString(),
   },
 ]
