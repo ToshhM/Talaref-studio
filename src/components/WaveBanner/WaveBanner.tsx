@@ -29,9 +29,9 @@ export function WaveBanner() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60 z-[1]" />
 
       <div className="absolute inset-0 z-[2]">
-        <div className="absolute top-1/4 left-1/4 w-[700px] h-[700px] bg-purple-600/8 rounded-full blur-[180px] animate-pulse" />
-        <div className="absolute bottom-1/3 right-1/4 w-[650px] h-[650px] bg-blue-500/7 rounded-full blur-[170px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-pink-500/6 rounded-full blur-[200px]" />
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-600/8 rounded-full blur-[90px]" />
+        <div className="absolute bottom-1/3 right-1/4 w-[450px] h-[450px] bg-blue-500/7 rounded-full blur-[85px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-pink-500/6 rounded-full blur-[100px]" />
       </div>
 
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-8">

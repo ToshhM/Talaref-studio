@@ -74,7 +74,7 @@ export const ExpertiseDeployment: React.FC = () => {
     const springConfig = useMemo(() => ({
         stiffness: isMobile ? 100 : 70,
         damping: isMobile ? 20 : 30,
-        restDelta: 0.001,
+        restDelta: 0.01,
         mass: isMobile ? 0.5 : 1
     }), [isMobile]);
 
@@ -113,22 +113,7 @@ export const ExpertiseDeployment: React.FC = () => {
             ref={containerRef}
             className="relative h-[450vh] bg-background flex flex-col items-center"
         >
-            {/* CSS pour accélération GPU */}
-            <style jsx global>{`
-                .gpu-accelerate {
-                    transform: translateZ(0);
-                    backface-visibility: hidden;
-                    -webkit-backface-visibility: hidden;
-                    perspective: 1000px;
-                    -webkit-perspective: 1000px;
-                }
-                
-                @media (max-width: 1023px) {
-                    .expertise-card-container {
-                        transform: translate3d(0, 0, 0);
-                    }
-                }
-            `}</style>
+
 
             <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden">
 

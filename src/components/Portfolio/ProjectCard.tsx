@@ -17,7 +17,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
 
   return (
     <motion.article
-      layout
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
@@ -69,19 +68,22 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
           </div>
         )}
 
-        {/* CTA */}
-        <motion.div
+        {/* CTA — pure CSS transitions instead of framer-motion animate */}
+        <div
           className={styles.cardCta}
-          animate={{ gap: isHovered ? '1.5rem' : '1rem' }}
+          style={{ gap: isHovered ? '1.5rem' : '1rem', transition: 'gap 0.3s ease' }}
         >
           <span>Voir le projet</span>
-          <motion.span
-            animate={{ x: isHovered ? 5 : 0 }}
+          <span
             className="text-2xl"
+            style={{
+              transform: isHovered ? 'translateX(5px)' : 'translateX(0)',
+              transition: 'transform 0.3s ease',
+            }}
           >
             →
-          </motion.span>
-        </motion.div>
+          </span>
+        </div>
       </div>
     </motion.article>
   )

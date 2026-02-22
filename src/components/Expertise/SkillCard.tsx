@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ExpertiseItem } from './types';
@@ -15,6 +15,7 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // Détection mobile pour désactiver les animations lourdes
   useEffect(() => {
@@ -26,12 +27,9 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Effet de parallaxe au survol (désactivé sur mobile)
-  const [rotateX, setRotateX] = useState(0);
-  const [rotateY, setRotateY] = useState(0);
-
+  // Parallax via CSS custom properties — zero React re-renders
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (isMobile) return; // Désactiver sur mobile
+    if (isMobile || !cardRef.current) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -40,13 +38,18 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
     const centerY = rect.height / 2;
     const degX = (y - centerY) / 20;
     const degY = (centerX - x) / 20;
-    setRotateX(degX);
-    setRotateY(degY);
+
+    cardRef.current.style.setProperty('--rx', `${degX}deg`);
+    cardRef.current.style.setProperty('--ry', `${degY}deg`);
+    cardRef.current.style.setProperty('--light-x', `${degY * 20 + 50}%`);
+    cardRef.current.style.setProperty('--light-y', `${-degX * 20 + 50}%`);
   }, [isMobile]);
 
   const handleMouseLeave = useCallback(() => {
-    setRotateX(0);
-    setRotateY(0);
+    if (cardRef.current) {
+      cardRef.current.style.setProperty('--rx', '0deg');
+      cardRef.current.style.setProperty('--ry', '0deg');
+    }
     setIsHovered(false);
   }, []);
 
@@ -62,10 +65,8 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
 
   // Configuration simplifiée pour mobile
   const cardMotionProps = isMobile ? {
-    // Mobile: pas d'animations complexes
     whileTap: { scale: 0.98 }
   } : {
-    // Desktop: animations complètes
     transition: { type: "spring" as const, stiffness: 400, damping: 40 },
     whileHover: {
       scale: 1.05,
@@ -77,6 +78,7 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
 
   return (
     <motion.div
+      ref={cardRef}
       className={`perspective-2000 w-full h-[450px] cursor-pointer gpu-accelerate ${className}`}
       onClick={handleClick}
       onMouseMove={!isMobile ? handleMouseMove : undefined}
@@ -84,10 +86,15 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
       onMouseEnter={handleMouseEnter}
       style={{
         ...style,
-        rotateX: isMobile ? 0 : rotateX,
-        rotateY: isMobile ? 0 : rotateY,
+        // Use CSS custom properties for zero-rerender parallax
+        rotateX: isMobile ? 0 : 'var(--rx, 0deg)',
+        rotateY: isMobile ? 0 : 'var(--ry, 0deg)',
         willChange: isMobile ? 'auto' : 'transform',
-      }}
+        '--rx': '0deg',
+        '--ry': '0deg',
+        '--light-x': '50%',
+        '--light-y': '50%',
+      } as React.CSSProperties}
       {...cardMotionProps}
     >
       <div className="relative w-full h-full preserve-3d">
@@ -106,12 +113,12 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
             />
           )}
 
-          {/* Effet de lumière qui suit la souris - désactivé sur mobile */}
+          {/* Effet de lumière qui suit la souris via CSS vars — no re-render */}
           {!isMobile && (
             <div
               className="absolute inset-0 rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               style={{
-                background: `radial-gradient(600px circle at ${rotateY * 20 + 50}% ${-rotateX * 20 + 50}%, rgba(184, 206, 32, 0.15), transparent 40%)`,
+                background: `radial-gradient(600px circle at var(--light-x, 50%) var(--light-y, 50%), rgba(184, 206, 32, 0.15), transparent 40%)`,
               }}
             />
           )}
@@ -142,7 +149,7 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
             </p>
           </div>
 
-          {/* Tags de compétences - animations simplifiées */}
+          {/* Tags de compétences */}
           <div className="flex flex-wrap gap-2 relative z-10">
             {item.skills.slice(0, 4).map((skill) => (
               <span
@@ -167,25 +174,6 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
           />
         </div>
       </div>
-
-      <style jsx global>{`
-        .perspective-2000 { perspective: 2000px; }
-        .preserve-3d { transform-style: preserve-3d; }
-        .gpu-accelerate {
-          transform: translateZ(0);
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
-        }
-        
-        @media (max-width: 1023px) {
-          .perspective-2000 {
-            perspective: none;
-          }
-          .preserve-3d {
-            transform-style: flat;
-          }
-        }
-      `}</style>
     </motion.div>
   );
 };

@@ -13,8 +13,6 @@
    Reset & Base Styles 
    ======================== */
 :root {
-  /* Keeping some original tokens that might be useful for glassmorphism 
-     that are not strictly colors, but simplifying significantly */
   --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-bg-hover: rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.1);
@@ -25,7 +23,6 @@
 body {
   font-family: 'Inter', sans-serif;
   background-color: var(--color-background);
-  /* Using the theme variable */
   color: white;
   margin: 0;
   overflow-x: hidden;
@@ -44,19 +41,22 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: #004269;
-  /* principale */
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #B8CE20;
-  /* secondaire */
 }
 
 /* ========================
-   Utilities & components
-   (Preserved helper classes that might be used in the potential project)
+   GPU Acceleration Utilities
+   (centralized — no more inline <style jsx>)
    ======================== */
+.gpu-accelerate {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
 
 .perspective-2000 {
   perspective: 2000px;
@@ -64,4 +64,34 @@ body {
 
 .preserve-3d {
   transform-style: preserve-3d;
+}
+
+@media (max-width: 1023px) {
+  .perspective-2000 {
+    perspective: none;
+  }
+
+  .preserve-3d {
+    transform-style: flat;
+  }
+
+  .expertise-card-container {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ========================
+   Reduced Motion
+   (accessibility + performance)
+   ======================== */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
