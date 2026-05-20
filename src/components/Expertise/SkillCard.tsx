@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, HTMLMotionProps } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ExpertiseItem } from './types';
 
@@ -60,8 +60,8 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
     router.push(`/portfolio?category=${item.category}`);
   }, [router, item.category]);
 
-  // Configuration simplifiée pour mobile
-  const cardMotionProps = isMobile ? {
+  // Configuration avec typage strict pour éviter que TS ne râle sur le build de production
+  const cardMotionProps: HTMLMotionProps<"div"> = isMobile ? {
     // Mobile: pas d'animations complexes
     whileTap: { scale: 0.98 }
   } : {
@@ -73,7 +73,7 @@ const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
       transition: { duration: 0.3 }
     },
     whileTap: { scale: 0.98 }
-  };
+  } as const; // <-- Le "as const" fige les types de chaînes comme "spring"
 
   return (
     <motion.div
