@@ -10,10 +10,11 @@ const socialLinks = [
 ];
 
 const navLinks = [
-    { label: 'Accueil', href: '#hero' },
-    { label: 'Expertises', href: '#expertise' },
-    { label: 'Projets', href: '#projets' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'Accueil', href: '/#hero' },
+    { label: 'Expertises', href: '/#expertise' },
+    { label: 'Projets', href: '/portfolio' },
+    { label: 'Réservation', href: '/reservation' },
+    { label: 'Contact', href: '/#contact' },
 ];
 
 export default function Footer() {
@@ -25,7 +26,7 @@ export default function Footer() {
                     {/* Brand Column */}
                     <div className={styles.brand}>
                         <motion.a
-                            href="#hero"
+                            href="/#hero"
                             className={styles.logo}
                             whileHover={{ scale: 1.05 }}
                         >
