@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 
 const navItems = [
     { label: 'Notre Agence', href: '/#hero' },
     { label: 'Expertise', href: '/#expertise' },
     { label: 'Portfolio', href: '/portfolio' },
+    { label: 'Réservation', href: '/reservation' },
     { label: 'Contact', href: '/#contact' },
 ];
 
@@ -14,52 +16,65 @@ export default function Header() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 50);
-        };
+    const pathname = usePathname();
+    const isReservationPage = pathname === '/reservation';
 
+    useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     return (
         <header className={`fixed top-0 left-0 right-0 z-[100] px-8 py-6 flex justify-between items-center transition-all duration-300 ${isScrolled ? 'backdrop-blur-xl bg-background/80 border-b border-white/5 py-4' : 'backdrop-blur-xl bg-background/50 border-b border-white/5'}`}>
-            <div className="flex items-center gap-3">
+
+            {/* 1. Bloc de gauche (Logo) avec flex-1 pour équilibrer */}
+            <div className="flex flex-1 items-center gap-3">
                 <div className="w-10 h-10 bg-secondaire rounded-xl flex items-center justify-center font-black text-background text-lg shadow-lg shadow-secondaire/20">T</div>
                 <span className="font-black tracking-tighter text-2xl uppercase text-white">Talaref.</span>
             </div>
 
-            <nav className="hidden md:flex items-center gap-10">
+            {/* 2. Bloc central (Navigation) centré */}
+            <nav className="hidden md:flex flex-shrink-0 items-center justify-center gap-10">
                 {navItems.map((item) => (
                     <a
                         key={item.label}
                         href={item.href}
-                        className="text-xs font-black uppercase tracking-widest text-white/50 hover:text-secondaire transition-colors"
+                        className={`text-xs font-black uppercase tracking-widest transition-colors ${
+                            pathname === item.href ? 'text-secondaire' : 'text-white/50 hover:text-secondaire'
+                        }`}
                     >
                         {item.label}
                     </a>
                 ))}
             </nav>
 
-            <div className="hidden md:block">
-                <button className="bg-white/10 hover:bg-secondaire hover:text-background text-white px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest transition-all transform hover:scale-105 active:scale-95 border border-white/10 hover:border-secondaire">
-                    Start Project
+            {/* 3. Bloc de droite (Bouton et/ou menu mobile) avec flex-1 et justify-end */}
+            <div className="flex flex-1 items-center justify-end">
+                {!isReservationPage && (
+                    <div className="hidden md:block">
+                        <a
+                            href="/reservation"
+                            className="inline-flex bg-white/10 hover:bg-secondaire hover:text-background text-white px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest transition-all transform hover:scale-105 active:scale-95 border border-white/10 hover:border-secondaire"
+                        >
+                            RÉSERVER
+                        </a>
+                    </div>
+                )}
+
+                {/* Mobile Menu Button */}
+                <button
+                    className="md:hidden w-10 h-10 flex flex-col justify-center items-center gap-1.5 focus:outline-none ml-auto"
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    aria-label="Toggle menu"
+                >
+                    <div className={`w-6 h-0.5 bg-white transition-all ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                    <div className={`w-6 h-0.5 bg-white transition-all ${isMobileMenuOpen ? 'opacity-0' : ''}`} />
+                    <div className={`w-6 h-0.5 bg-white transition-all ${isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
                 </button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-                className="md:hidden w-10 h-10 flex flex-col justify-center items-center gap-1.5 focus:outline-none"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                aria-label="Toggle menu"
-            >
-                <div className={`w-6 h-0.5 bg-white transition-all ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-                <div className={`w-6 h-0.5 bg-white transition-all ${isMobileMenuOpen ? 'opacity-0' : ''}`} />
-                <div className={`w-6 h-0.5 bg-white transition-all ${isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
-            </button>
-
-            {/* Mobile Menu */}
+            {/* Mobile Menu Dropdown */}
             <AnimatePresence>
                 {isMobileMenuOpen && (
                     <motion.div
@@ -73,15 +88,24 @@ export default function Header() {
                             <a
                                 key={item.label}
                                 href={item.href}
-                                className="text-sm font-bold uppercase text-white/70 hover:text-secondaire"
+                                className={`text-sm font-bold uppercase ${
+                                    pathname === item.href ? 'text-secondaire' : 'text-white/70 hover:text-secondaire'
+                                }`}
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
                                 {item.label}
                             </a>
                         ))}
-                        <button className="bg-secondaire text-background px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest mt-4">
-                            Start Project
-                        </button>
+
+                        {!isReservationPage && (
+                            <a
+                                href="/reservation"
+                                className="bg-secondaire text-background px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest mt-4 text-center"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                Réservation
+                            </a>
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>
