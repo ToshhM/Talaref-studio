@@ -8,7 +8,7 @@ import { ExpertiseItem } from './types';
 interface SkillCardProps {
   item: ExpertiseItem;
   className?: string;
-  style?: any;
+  style?: HTMLMotionProps<"div">["style"];
 }
 
 const SkillCard: React.FC<SkillCardProps> = ({ item, className, style }) => {
