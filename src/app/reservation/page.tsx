@@ -5,7 +5,7 @@ import { ReservationPage } from "@/components/Reservation";
 
 export const metadata: Metadata = {
   title: "Réservation | TALAREF STUDIO",
-  description: "Réservez une prestation photo ou video avec TALAREF STUDIO.",
+  description: "Réservez une prestation photo ou vidéo avec TALAREF STUDIO.",
 };
 
 export default function Reservation() {

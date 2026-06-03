@@ -51,19 +51,19 @@ function SuccessContent() {
                 <polyline points="20 6 9 17 4 12" />
               </svg>
             </div>
-            <h1 className="text-4xl font-black uppercase tracking-tighter">Reserve !</h1>
+            <h1 className="text-4xl font-black uppercase tracking-tighter">Réservez !</h1>
             <p className="mt-4 text-white/60">
-              Merci ! Votre seance est confirmee. Vous allez recevoir un mail recapitulatif d&apos;ici quelques instants.
+              Merci ! Votre séance est confirmée. Vous allez recevoir un e-mail récapitulatif d&apos;ici quelques instants.
             </p>
             <Link href="/" className="mt-10 inline-block rounded-2xl bg-white/5 px-8 py-4 font-bold transition-all hover:bg-white/10">
-              Retour a l&apos;accueil
+              Retour à l&apos;accueil
             </Link>
           </>
         )}
 
         {status === "error" && (
           <p className="text-red-400">
-            Une erreur est survenue lors de la confirmation. Contactez-nous si vous avez ete debite.
+            Une erreur est survenue lors de la confirmation. Contactez-nous si vous avez été débité.
           </p>
         )}
       </motion.div>

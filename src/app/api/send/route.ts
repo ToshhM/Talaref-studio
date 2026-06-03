@@ -1,119 +1,153 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { calculateBookingPrice } from '@/lib/priceCalculator'; // <-- Vérifie juste que ce chemin correspond à ton projet
+import {
+  calculateExpectedPaymentAmount,
+  getConfiguredSiteUrl,
+  parseBookingInput,
+} from '@/lib/bookingSecurity';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2026-04-22.dahlia',
 });
 
+function formatAmountForMetadata(value: number): string {
+  return value.toFixed(2);
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    const booking = parseBookingInput(body);
+    const captchaToken =
+      typeof body.captchaToken === 'string' ? body.captchaToken.trim() : '';
 
-    // On récupère tout ce que le front envoie, y compris le téléphone et le SIRET !
-    const {
-      email, firstName, lastName, phone, siret, date, formattedDate,
-      slot, duration, paymentMode, service, message, captchaToken
-    } = body;
+    if (!captchaToken || captchaToken.length > 2048) {
+      return NextResponse.json({ error: 'Captcha manquant.' }, { status: 400 });
+    }
 
-    // --- 1. SÉCURITÉ : VERIFICATION DU CAPTCHA ---
     const formData = new FormData();
     formData.append('secret', process.env.TURNSTILE_SECRET_KEY!);
     formData.append('response', captchaToken);
 
-    const verifyResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      body: formData,
-    });
+    const verifyResponse = await fetch(
+      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+      {
+        method: 'POST',
+        body: formData,
+      }
+    );
 
     const verifyData = await verifyResponse.json();
 
     if (!verifyData.success) {
-      return NextResponse.json({ error: 'Captcha invalide' }, { status: 400 });
+      return NextResponse.json({ error: 'Captcha invalide.' }, { status: 400 });
     }
 
-    // --- 2. SÉCURITÉ : VERIFICATION DU SIRET VIA L'ÉTAT ---
-    let legalName = "";
-    if (siret) {
-      // On nettoie les espaces éventuels et on interroge l'API ouverte du gouvernement
-      const siretClean = siret.replace(/\s/g, '');
-      const siretRes = await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${siretClean}`);
-      const siretData = await siretRes.json();
+    let legalName = '';
 
-      // Si l'API ne trouve rien, on bloque la transaction net
-      if (!siretData.results || siretData.results.length === 0) {
-         return NextResponse.json({ error: 'Numéro de SIRET invalide ou introuvable.' }, { status: 400 });
+    if (booking.siret) {
+      const siretRes = await fetch(
+        `https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(
+          booking.siret
+        )}`
+      );
+
+      if (!siretRes.ok) {
+        return NextResponse.json(
+          { error: 'Impossible de verifier le numero de SIRET pour le moment.' },
+          { status: 400 }
+        );
       }
 
-      // On récupère le vrai nom officiel de la boîte
-      legalName = siretData.results[0].nom_complet;
+      const siretData = await siretRes.json();
+
+      if (!siretData.results || siretData.results.length === 0) {
+        return NextResponse.json(
+          { error: 'Numero de SIRET invalide ou introuvable.' },
+          { status: 400 }
+        );
+      }
+
+      legalName = String(siretData.results[0].nom_complet || '').slice(0, 160);
     }
 
-    // --- 3. SÉCURITÉ : CALCUL DU PRIX CÔTÉ SERVEUR ---
-    // Si un SIRET valide est passé, on applique les tarifs entreprise d'office
-    const isEnterprise = !!siret;
-    const parsedDuration = parseInt(duration) || 1;
+    const expectedAmount = calculateExpectedPaymentAmount(booking);
+    const amountInCents = expectedAmount.amountInCents;
 
-    // Le serveur recalcule tout depuis zéro, impossible de tricher côté client !
-    const totalBasePrice = calculateBookingPrice(service, parsedDuration, slot, isEnterprise);
-
-    let finalTotalAmount = totalBasePrice;
-    let paymentTitle = `Réservation : ${service}`;
-
-    if (paymentMode === "deposit") {
-      finalTotalAmount = totalBasePrice * 0.3;
-      paymentTitle = `Acompte (30%) : ${service}`;
+    if (!Number.isInteger(amountInCents) || amountInCents <= 0) {
+      return NextResponse.json(
+        { error: 'Montant de paiement invalide.' },
+        { status: 400 }
+      );
     }
 
-    // On arrondit pour que Stripe ne crash pas avec des centimes à virgule
-    const amountInCents = Math.round(finalTotalAmount * 100);
+    const paymentTitle =
+      booking.paymentMode === 'deposit'
+        ? `Acompte (30%) : ${booking.service}`
+        : `Reservation : ${booking.service}`;
+    const siteUrl = getConfiguredSiteUrl(req.headers.get('origin'));
 
-    // --- 4. CREATION DE LA SESSION STRIPE ---
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card', 'link'],
-      customer_email: email,
+      customer_email: booking.email,
       line_items: [
         {
           price_data: {
             currency: 'eur',
             product_data: {
               name: paymentTitle,
-              // On affiche la raison sociale de l'entreprise si elle existe
-              description: `Client : ${firstName} ${lastName}${legalName ? ` (${legalName})` : ''} - Le ${formattedDate} à ${slot} (${duration}h)`,
+              description: `Client : ${booking.firstName} ${booking.lastName}${
+                legalName ? ` (${legalName})` : ''
+              } - Le ${booking.formattedDate || booking.date} a ${booking.slot} (${
+                booking.duration
+              }h)`,
             },
             unit_amount: amountInCents,
           },
-          // Attention ici : quantity passe à 1 car 'amountInCents' contient déjà le total de toutes les heures
           quantity: 1,
         },
       ],
       mode: 'payment',
-
-      // On balance tout dans les métadonnées pour que ton webhook api/confirm puisse les lire
       metadata: {
-        firstName: firstName || "",
-        lastName: lastName || "",
-        email: email || "",
-        phone: phone || "",
-        siret: siret || "",
-        companyName: legalName || "",
-        date: date || "",
-        formattedDate: formattedDate || "",
-        slot: slot || "",
-        duration: duration?.toString() || "1",
-        paymentMode: paymentMode || "full",
-        service: service || "",
-        message: message || "Aucune information",
+        firstName: booking.firstName,
+        lastName: booking.lastName,
+        email: booking.email,
+        phone: booking.phone,
+        siret: booking.siret,
+        companyName: legalName,
+        date: booking.date,
+        formattedDate: booking.formattedDate,
+        slot: booking.slot,
+        duration: booking.duration.toString(),
+        paymentMode: booking.paymentMode,
+        service: booking.service,
+        message: booking.message || 'Aucune information',
+        baseAmount: formatAmountForMetadata(expectedAmount.baseAmount),
+        paidAmount: formatAmountForMetadata(expectedAmount.paidAmount),
       },
-
-      success_url: `${req.headers.get('origin')}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get('origin')}/reservation`,
+      success_url: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${siteUrl}/reservation`,
     });
 
-    return NextResponse.json({ url: session.url });
+    if (!session.url) {
+      return NextResponse.json(
+        { error: 'Impossible de generer le lien de paiement.' },
+        { status: 500 }
+      );
+    }
 
+    return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error("Erreur serveur/Stripe :", error);
-    return NextResponse.json({ error: 'Erreur lors de la création du paiement' }, { status: 500 });
+    console.error('Erreur serveur/Stripe :', error);
+
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Erreur lors de la creation du paiement.',
+      },
+      { status: 500 }
+    );
   }
 }

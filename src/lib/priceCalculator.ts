@@ -1,5 +1,5 @@
 /**
- * Fonction utilitaire pour calculer le nombre d'heures de nuit (22h - 9h)
+ * Fonction utilitaire pour calculer le nombre d'heures de nuit (23h - 9h)
  * dans un créneau donné.
  */
 export function calculateNightHours(startTimeStr: string, duration: number): number {
@@ -12,8 +12,8 @@ export function calculateNightHours(startTimeStr: string, duration: number): num
     // On vérifie l'heure courante (modulo 24 pour gérer minuit)
     const currentHour = (startHour + i) % 24;
 
-    // La nuit chez Talaref, c'est de 22h (inclus) à 9h (exclu)
-    if (currentHour >= 22 || currentHour < 9) {
+    // La nuit chez Talaref, c'est de 23h (inclus) à 9h (exclu)
+    if (currentHour >= 23 || currentHour < 9) {
       nightHours++;
     }
   }
@@ -34,7 +34,7 @@ export function calculateBookingPrice(
 
   // Pour les forfaits fixes (Podcast), on regarde juste si ça COMMENCE de nuit
   const startHour = Number(slot.split(':')[0]);
-  const isNightStart = startHour >= 22 || startHour < 9;
+  const isNightStart = startHour >= 23 || startHour < 9;
 
   let basePrice = 0;
 

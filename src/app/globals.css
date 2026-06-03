@@ -9,6 +9,13 @@
   --font-inter: 'Inter', sans-serif;
 }
 
+.night-theme {
+  --color-secondaire: #FF2D55 !important;
+  --color-principale: #4C0519 !important;
+  --color-background: #0A0103 !important;
+  --glass-border-hover: rgba(255, 45, 85, 0.3) !important;
+}
+
 /* ========================
    Reset & Base Styles 
    ======================== */

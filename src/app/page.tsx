@@ -23,7 +23,7 @@ export default function Home() {
             </div>
             <div className="p-12 bg-principale/10 rounded-[3rem] border border-white/5 hover:border-secondaire/20 transition-colors group">
               <span className="block text-6xl font-black text-white mb-4 group-hover:scale-110 transition-transform">4 </span>
-              <span className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-black">domaines d'expertise</span>
+              <span className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-black">domaines d&apos;expertise</span>
             </div>
             <div className="p-12 bg-principale/10 rounded-[3rem] border border-white/5 hover:border-secondaire/20 transition-colors group">
               <span className="block text-6xl font-black text-secondaire mb-4 group-hover:scale-110 transition-transform">90%</span>

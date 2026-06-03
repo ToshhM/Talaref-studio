@@ -2,8 +2,13 @@
 
 import { useRef, useMemo, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text3D, Center, Float, Sparkles, useScroll, ScrollControls, Environment } from '@react-three/drei';
+import { Text3D, Center, Float, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
+
+function seededRandom(seed: number) {
+    const value = Math.sin(seed * 12.9898) * 43758.5453;
+    return value - Math.floor(value);
+}
 
 // Fire-like particles component
 function FireParticles() {
@@ -13,9 +18,9 @@ function FireParticles() {
     const positionsArray = useMemo(() => {
         const pos = new Float32Array(count * 3);
         for (let i = 0; i < count; i++) {
-            pos[i * 3] = (Math.random() - 0.5) * 8;
-            pos[i * 3 + 1] = Math.random() * -3 - 2;
-            pos[i * 3 + 2] = (Math.random() - 0.5) * 4;
+            pos[i * 3] = (seededRandom(i + 1) - 0.5) * 8;
+            pos[i * 3 + 1] = seededRandom(i + 2) * -3 - 2;
+            pos[i * 3 + 2] = (seededRandom(i + 3) - 0.5) * 4;
         }
         return pos;
     }, []);
@@ -23,9 +28,9 @@ function FireParticles() {
     const velocities = useMemo(() => {
         const vel = new Float32Array(count * 3);
         for (let i = 0; i < count; i++) {
-            vel[i * 3] = (Math.random() - 0.5) * 0.02;
-            vel[i * 3 + 1] = Math.random() * 0.03 + 0.01;
-            vel[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+            vel[i * 3] = (seededRandom(i + 101) - 0.5) * 0.02;
+            vel[i * 3 + 1] = seededRandom(i + 102) * 0.03 + 0.01;
+            vel[i * 3 + 2] = (seededRandom(i + 103) - 0.5) * 0.02;
         }
         return vel;
     }, []);
@@ -42,9 +47,9 @@ function FireParticles() {
             positions[i * 3 + 2] += velocities[i * 3 + 2];
 
             if (positions[i * 3 + 1] > 3) {
-                positions[i * 3] = (Math.random() - 0.5) * 8;
+                positions[i * 3] = (seededRandom(i + Math.floor(positions[i * 3 + 1] * 100)) - 0.5) * 8;
                 positions[i * 3 + 1] = -3;
-                positions[i * 3 + 2] = (Math.random() - 0.5) * 4;
+                positions[i * 3 + 2] = (seededRandom(i + 500) - 0.5) * 4;
             }
         }
 
