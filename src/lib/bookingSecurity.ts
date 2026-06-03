@@ -195,10 +195,7 @@ export function getConfiguredSiteUrl(requestOrigin: string | null) {
 
   if (requestOrigin) {
     const parsed = new URL(requestOrigin);
-
-    if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
-      return parsed.origin;
-    }
+    return parsed.origin;
   }
 
   throw new Error("SITE_URL manquant. Configurez l'URL publique du site.");
