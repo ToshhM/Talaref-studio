@@ -30,7 +30,6 @@ export function calculateBookingPrice(
   slot: string,
   isEnterprise: boolean = false
 ): number {
-  return 0.50; // TEMPORARY 50-CENT TEST RATE
   const nightHours = calculateNightHours(slot, duration);
 
   // Pour les forfaits fixes (Podcast), on regarde juste si ça COMMENCE de nuit
