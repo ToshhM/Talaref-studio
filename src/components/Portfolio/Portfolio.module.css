@@ -8,7 +8,19 @@
   border-radius: 3rem;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* backdrop-filter on many stacked/animated cards is the main cause of
+   scroll jank on mobile Safari (it forces a repaint of the blurred
+   region on every scroll frame). Swap it for a solid background below
+   the desktop breakpoint instead of blurring. */
+@media (max-width: 768px) {
+  .projectCard {
+    background: rgba(0, 40, 64, 0.85);
+    backdrop-filter: none;
+  }
 }
 
 .projectCard:hover {
@@ -56,6 +68,12 @@
   border-radius: 9999px;
   z-index: 2;
   color: #001829;
+}
+
+@media (max-width: 768px) {
+  .categoryBadge {
+    backdrop-filter: none;
+  }
 }
 
 /* Card Content */
