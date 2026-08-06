@@ -82,12 +82,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    try {
-      const apiKey = process.env.RESEND_API_KEY
-      if (apiKey) {
-        const { Resend } = await import('resend')
-        const resend = new Resend(apiKey)
+    const apiKey = process.env.RESEND_API_KEY
+    if (apiKey) {
+      const { Resend } = await import('resend')
+      const resend = new Resend(apiKey)
 
+      try {
         await resend.emails.send({
           from: 'Talaref Studio <contact@talaref.co>',
           to: ['contact@talaref.co'],
@@ -114,9 +114,37 @@ export async function POST(request: NextRequest) {
             </div>
           `,
         })
+      } catch (emailError) {
+        console.error('Event booking admin email error:', emailError)
       }
-    } catch (emailError) {
-      console.error('Event booking email error:', emailError)
+
+      try {
+        await resend.emails.send({
+          from: 'Talaref Studio <contact@talaref.co>',
+          to: [email],
+          subject: `Confirmation - Shooting Day Congolais du ${eventDate.label}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #c8ff00; background: #001829; padding: 20px; border-radius: 10px;">
+                Votre créneau est confirmé !
+              </h2>
+
+              <div style="padding: 20px; background: #f5f5f5; border-radius: 10px; margin-top: 20px;">
+                <p>Bonjour ${firstName},</p>
+                <p>Votre réservation pour le <strong>Shooting Day Spécial Congolais</strong> est bien enregistrée.</p>
+                <p><strong>Date:</strong> ${eventDate.label}</p>
+                <p><strong>Créneau:</strong> ${slot} (20 min)</p>
+              </div>
+
+              <p style="color: #666; font-size: 12px; margin-top: 20px;">
+                Besoin de modifier ou annuler votre créneau ? Répondez simplement à cet email.
+              </p>
+            </div>
+          `,
+        })
+      } catch (emailError) {
+        console.error('Event booking client email error:', emailError)
+      }
     }
 
     return NextResponse.json({ success: true, id: inserted?.id })
