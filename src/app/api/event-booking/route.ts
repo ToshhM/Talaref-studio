@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { BrevoClient } from '@getbrevo/brevo'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { getCongoEventDate } from '@/lib/eventDate'
 
@@ -82,18 +83,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const apiKey = process.env.RESEND_API_KEY
+    const apiKey = process.env.BREVO_API_KEY
     if (apiKey) {
-      const { Resend } = await import('resend')
-      const resend = new Resend(apiKey)
+      const brevo = new BrevoClient({ apiKey })
 
       try {
-        await resend.emails.send({
-          from: 'Talaref Studio <contact@talaref.co>',
-          to: ['contact@talaref.co'],
-          replyTo: email,
+        await brevo.transactionalEmails.sendTransacEmail({
+          sender: { name: 'Talaref Studio', email: 'contact@talaref.co' },
+          to: [{ email: 'contact@talaref.co' }],
+          replyTo: { email, name: `${firstName} ${lastName}` },
           subject: `Shooting Day Congolais - ${firstName} ${lastName} - ${slot}`,
-          html: `
+          htmlContent: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #c8ff00; background: #001829; padding: 20px; border-radius: 10px;">
                 Nouvelle réservation - Shooting Day Spécial Congolais
@@ -119,11 +119,11 @@ export async function POST(request: NextRequest) {
       }
 
       try {
-        await resend.emails.send({
-          from: 'Talaref Studio <contact@talaref.co>',
-          to: [email],
+        await brevo.transactionalEmails.sendTransacEmail({
+          sender: { name: 'Talaref Studio', email: 'contact@talaref.co' },
+          to: [{ email, name: `${firstName} ${lastName}` }],
           subject: `Confirmation - Shooting Day Congolais du ${eventDate.label}`,
-          html: `
+          htmlContent: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #c8ff00; background: #001829; padding: 20px; border-radius: 10px;">
                 Votre créneau est confirmé !

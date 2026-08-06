@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { BrevoClient } from '@getbrevo/brevo'
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,56 +15,54 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérification de la clé API
-    const apiKey = process.env.RESEND_API_KEY
+    const apiKey = process.env.BREVO_API_KEY
     if (!apiKey) {
-      console.error('RESEND_API_KEY is not configured')
+      console.error('BREVO_API_KEY is not configured')
       return NextResponse.json(
         { error: 'Configuration email manquante' },
         { status: 500 }
       )
     }
 
-    // Import dynamique de Resend pour éviter l'erreur au build
-    const { Resend } = await import('resend')
-    const resend = new Resend(apiKey)
+    const brevo = new BrevoClient({ apiKey })
 
     // Envoi de l'email
-    const { data, error } = await resend.emails.send({
-      from: 'Talaref Studio <contact@talaref.co>',
-      to: ['contact@talaref.co'],
-      replyTo: email,
-      subject: `Nouveau message de ${name} - ${service}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #c8ff00; background: #001829; padding: 20px; border-radius: 10px;">
-            Nouveau message depuis Talaref Studio
-          </h2>
-          
-          <div style="padding: 20px; background: #f5f5f5; border-radius: 10px; margin-top: 20px;">
-            <p><strong>Nom:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Service:</strong> ${service}</p>
-            <hr style="border: 1px solid #ddd; margin: 20px 0;">
-            <p><strong>Message:</strong></p>
-            <p style="white-space: pre-wrap;">${message}</p>
-          </div>
-          
-          <p style="color: #666; font-size: 12px; margin-top: 20px;">
-            Ce message a été envoyé depuis le formulaire de contact de talaref.co
-          </p>
-        </div>
-      `,
-    })
+    try {
+      await brevo.transactionalEmails.sendTransacEmail({
+        sender: { name: 'Talaref Studio', email: 'contact@talaref.co' },
+        to: [{ email: 'contact@talaref.co' }],
+        replyTo: { email, name },
+        subject: `Nouveau message de ${name} - ${service}`,
+        htmlContent: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #c8ff00; background: #001829; padding: 20px; border-radius: 10px;">
+              Nouveau message depuis Talaref Studio
+            </h2>
 
-    if (error) {
-      console.error('Resend error:', error)
+            <div style="padding: 20px; background: #f5f5f5; border-radius: 10px; margin-top: 20px;">
+              <p><strong>Nom:</strong> ${name}</p>
+              <p><strong>Email:</strong> ${email}</p>
+              <p><strong>Service:</strong> ${service}</p>
+              <hr style="border: 1px solid #ddd; margin: 20px 0;">
+              <p><strong>Message:</strong></p>
+              <p style="white-space: pre-wrap;">${message}</p>
+            </div>
+
+            <p style="color: #666; font-size: 12px; margin-top: 20px;">
+              Ce message a été envoyé depuis le formulaire de contact de talaref.co
+            </p>
+          </div>
+        `,
+      })
+    } catch (error) {
+      console.error('Brevo error:', error)
       return NextResponse.json(
         { error: 'Erreur lors de l\'envoi du message' },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({ success: true, data })
+    return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Contact API error:', error)
     return NextResponse.json(
