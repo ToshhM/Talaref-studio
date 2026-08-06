@@ -1,30 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { WaveScene } from '@/utils/threeScene';
-
 export function WaveBanner() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const sceneRef = useRef<WaveScene | null>(null);
-
-  useEffect(() => {
-    if (!canvasRef.current) return;
-
-    sceneRef.current = new WaveScene(canvasRef.current);
-
-    return () => {
-      if (sceneRef.current) {
-        sceneRef.current.dispose();
-      }
-    };
-  }, []);
-
   return (
     <section className="relative w-full h-screen overflow-hidden bg-black">
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full opacity-45"
-      />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#000814] via-black/40 to-black/60" />
 
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60 z-[1]" />
 

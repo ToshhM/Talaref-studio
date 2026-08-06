@@ -7,6 +7,9 @@ export type Json =
   | Json[]
 
 export interface Database {
+  __InternalSupabase: {
+    PostgrestVersion: "12"
+  }
   public: {
     Tables: {
       projects: {
@@ -67,9 +70,57 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
+      }
+      event_bookings: {
+        Row: {
+          id: string
+          first_name: string
+          last_name: string
+          email: string
+          phone: string
+          event_date: string
+          slot: string
+          message: string | null
+          status: 'confirmed' | 'cancelled'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          first_name: string
+          last_name: string
+          email: string
+          phone: string
+          event_date: string
+          slot: string
+          message?: string | null
+          status?: 'confirmed' | 'cancelled'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          first_name?: string
+          last_name?: string
+          email?: string
+          phone?: string
+          event_date?: string
+          slot?: string
+          message?: string | null
+          status?: 'confirmed' | 'cancelled'
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
   }
 }
 
 export type Project = Database['public']['Tables']['projects']['Row']
+export type EventBooking = Database['public']['Tables']['event_bookings']['Row']

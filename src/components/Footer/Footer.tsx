@@ -64,8 +64,8 @@ export default function Footer() {
                         <h4 className={styles.columnTitle}>Contact</h4>
                         <ul className={styles.contactList}>
                             <li>
-                                <a href="mailto:contact@toshh.fr" className={styles.contactLink}>
-                                    contact@toshh.fr
+                                <a href="mailto:contact@talaref.co" className={styles.contactLink}>
+                                    contact@talaref.co
                                 </a>
                             </li>
                             <li>

@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     // Envoi de l'email
     const { data, error } = await resend.emails.send({
       from: 'Talaref Studio <contact@talaref.co>',
-      to: ['contact@toshh.fr'],
+      to: ['contact@talaref.co'],
       replyTo: email,
       subject: `Nouveau message de ${name} - ${service}`,
       html: `
