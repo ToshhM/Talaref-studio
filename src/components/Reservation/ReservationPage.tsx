@@ -44,7 +44,7 @@ export function ReservationPage() {
   );
 
   return (
-    <section className={`min-h-screen bg-background px-6 pb-24 pt-36 text-white relative overflow-hidden transition-colors duration-500 ${isNightTime ? "night-theme" : ""}`}>
+    <section className="min-h-screen bg-background px-6 pb-24 pt-36 text-white relative overflow-hidden transition-colors duration-500">
       <div className="absolute left-1/2 top-0 h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-principale/20 blur-[150px] transition-colors duration-500" />
       <div className="absolute bottom-20 right-0 h-[420px] w-[420px] rounded-full bg-secondaire/10 blur-[130px] transition-colors duration-500" />
 

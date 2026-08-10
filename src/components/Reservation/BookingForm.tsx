@@ -442,8 +442,8 @@ export function BookingForm({ selectedService, selectedServiceId, isNightTime }:
       </div>
 
       {!isQuoteOnly && (isNightTime || selectedNightHours > 0) && (
-        <div className="mb-8 flex items-start gap-5 rounded-2xl border border-secondaire/30 bg-secondaire/5 p-6 text-sm text-white/90 backdrop-blur-md">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondaire/15 text-secondaire">
+        <div className="mb-8 flex items-start gap-5 rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-sm text-white/90 backdrop-blur-md">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -463,12 +463,10 @@ export function BookingForm({ selectedService, selectedServiceId, isNightTime }:
               <path d="M10 16h4" />
             </svg>
           </span>
-          <div className="leading-relaxed">
-            <h4 className="text-secondaire font-black uppercase tracking-wider text-xs mb-1">
-              {isNightTime
-                ? (selectedNightHours > 0 ? "Réservation Nocturne Active" : "Plage Horaire Nocturne Active")
-                : "Ajustement Tarifaire Nocturne"}
-            </h4>
+          <div className="leading-relaxed space-y-2">
+            <span className="inline-flex items-center rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-red-400">
+              Tarif de nuit
+            </span>
             <p className="text-white/80">
               {selectedService.title === "Location Du Studio" || isPhotographerService ? (
                 <span>Le créneau sélectionné démarre dans la plage nocturne (23h00 - 08h59), un forfait Soir de <strong>+10 €</strong> s&apos;applique automatiquement.</span>
