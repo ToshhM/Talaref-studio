@@ -8,6 +8,7 @@ import {
   escapeHtml,
   safeHttpsUrl,
 } from '@/lib/bookingSecurity';
+import { formatDurationHours } from '@/lib/duration';
 
 export const runtime = 'nodejs';
 
@@ -365,7 +366,7 @@ export async function POST(req: Request) {
     }
 
     const parsedDuration = Number(duration) || 1;
-    const durationLabel = `${parsedDuration} ${parsedDuration > 1 ? 'heures' : 'heure'}`;
+    const durationLabel = formatDurationHours(parsedDuration);
 
     const { startDateTime, endDateTime } = buildCalendarDateTimes(
       date,

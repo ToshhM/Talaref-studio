@@ -1,3 +1,5 @@
+import { findFormulaTierPrice } from "./photographerFormulas";
+
 /**
  * Fonction utilitaire pour calculer le nombre d'heures de nuit (23h - 9h)
  * dans un créneau donné.
@@ -36,35 +38,25 @@ export function calculateBookingPrice(
   const startHour = Number(slot.split(':')[0]);
   const isNightStart = startHour >= 23 || startHour < 9;
 
+  // Formules avec photographe (CV LinkedIn, Polas, Book, Anniversaire, Corporate...) :
+  // grille de prix fixe par formule + durée, forfait Soir de +10€ si le créneau démarre de nuit.
+  const formulaPrice = findFormulaTierPrice(serviceTitle, duration);
+  if (formulaPrice !== null) {
+    return isNightStart ? formulaPrice + 10 : formulaPrice;
+  }
+
   let basePrice = 0;
 
   switch (serviceTitle) {
     case "Location Du Studio": {
-      // Paliers dégressifs : 1h=75€, 2h=70€/h, 4h=60€/h, 10h=52€/h
-      let hourlyRate = 75;
-      if (duration >= 10) hourlyRate = 52;
-      else if (duration >= 4) hourlyRate = 60;
-      else if (duration >= 2) hourlyRate = 70;
+      // Grille tarifaire fixe (tarif Jour)
+      const dayRates: Record<number, number> = {
+        1: 40, 2: 80, 3: 100, 4: 130, 5: 160, 6: 190, 8: 250, 10: 310, 12: 340, 14: 380,
+      };
+      basePrice = dayRates[duration] ?? duration * 40;
 
-      basePrice = duration * hourlyRate;
-
-      // Majoration nuit : +100€ par heure passée entre 22h et 9h
-      basePrice += (nightHours * 100);
-      break;
-    }
-
-    case "Prestation Avec Photographe":
-    case "Shooting Corporate": { // Je l'ai groupé avec la prestation photo
-      // Paliers dégressifs : 1h=200€, 2h=190€/h, 4h=170€/h, 10h=130€/h
-      let hourlyRate = 200;
-      if (duration >= 10) hourlyRate = 130;
-      else if (duration >= 4) hourlyRate = 170;
-      else if (duration >= 2) hourlyRate = 190;
-
-      basePrice = duration * hourlyRate;
-
-      // Majoration nuit : +100€ par heure passée entre 22h et 9h
-      basePrice += (nightHours * 100);
+      // Forfait Soir : +10€ fixe si le créneau démarre entre 23h et 9h
+      if (isNightStart) basePrice += 10;
       break;
     }
 

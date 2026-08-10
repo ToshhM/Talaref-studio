@@ -98,7 +98,10 @@ export function parseBookingInput(
     throw new Error("Creneau de reservation invalide.");
   }
 
-  if (!Number.isInteger(duration) || duration <= 0) {
+  const isHalfHourMultiple =
+    Number.isFinite(duration) && duration > 0 && Math.round(duration * 2) === duration * 2;
+
+  if (!isHalfHourMultiple) {
     throw new Error("Duree de reservation invalide.");
   }
 

@@ -5,6 +5,7 @@ import {
   getConfiguredSiteUrl,
   parseBookingInput,
 } from '@/lib/bookingSecurity';
+import { formatDurationHours } from '@/lib/duration';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2026-04-22.dahlia',
@@ -98,9 +99,9 @@ export async function POST(req: Request) {
               name: paymentTitle,
               description: `Client : ${booking.firstName} ${booking.lastName}${
                 legalName ? ` (${legalName})` : ''
-              } - Le ${booking.formattedDate || booking.date} a ${booking.slot} (${
+              } - Le ${booking.formattedDate || booking.date} a ${booking.slot} (${formatDurationHours(
                 booking.duration
-              }h)`,
+              )})`,
             },
             unit_amount: amountInCents,
           },

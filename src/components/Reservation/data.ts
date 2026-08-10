@@ -9,34 +9,18 @@ export type Service = {
   includes: string[];
 };
 
-export const BOOKING_DURATIONS = [1, 2, 3, 4, 5, 6, 8, 10];
+export const BOOKING_DURATIONS = [1, 2, 3, 4, 5, 6, 8, 10, 12, 14];
 export const PODCAST_DURATIONS = [1, 2, 3, 4];
 export const FORMATION_DURATIONS = [4, 8];
 
 export const services: Service[] = [
-  {
-    id: "shooting-corporate",
-    title: "Shooting Corporate",
-    eyebrow: "Pro / Entreprise",
-    durationText: "Tarification",
-    baseDuration: 1,
-    price: "Dès 200€",
-    description:
-      "Séance de shooting corporate professionnel. 15 photos retouchées incluant retouches couleurs et édition premium.",
-    includes: [
-      "Direction de pose",
-      "15 photos retouchées",
-      "Édition premium",
-      "Livraison rapide",
-    ],
-  },
   {
     id: "location-studio",
     title: "Location Du Studio",
     eyebrow: "Espace brut",
     durationText: "Tarification",
     baseDuration: 1,
-    price: "Dès 75€",
+    price: "Dès 40€",
     description:
       "Location horaire, demi-journée, journée, événements, workshop. Ouvert 24/7.",
     includes: ["Accès plateau", "Lumières de base", "Espace loge", "Wifi Haut Débit"],
@@ -44,13 +28,13 @@ export const services: Service[] = [
   {
     id: "prestation-photographe",
     title: "Prestation Avec Photographe",
-    eyebrow: "Sur mesure",
-    durationText: "Tarification",
-    baseDuration: 1,
-    price: "Dès 200€",
+    eyebrow: "Formules clé en main",
+    durationText: "Selon formule",
+    baseDuration: 0.5,
+    price: "Dès 40€",
     description:
-      "Shooting photo, tournage vidéo, événement, corporate, social media.",
-    includes: ["Photographe pro", "Matériel inclus", "Direction artistique", "Galerie privée"],
+      "CV LinkedIn, Polas, Book, Anniversaire, Couple, Grossesse, Corporate... Choisissez votre formule, le prix s'ajuste automatiquement.",
+    includes: ["Photographe pro", "Photos retouchées", "Formule adaptée à votre besoin", "Livraison rapide"],
   },
   {
     id: "podcasts",
