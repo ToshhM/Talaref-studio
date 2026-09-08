@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ReservationEventBanner } from "./ReservationEventBanner";
 import { ReservationHero } from "./ReservationHero";
 import { ServiceSelector } from "./ServiceSelector";
 import { BookingForm } from "./BookingForm";
@@ -62,7 +61,6 @@ export function ReservationPage() {
       <div className="absolute bottom-20 right-0 h-[420px] w-[420px] rounded-full bg-secondaire/10 blur-[130px] transition-colors duration-500" />
 
       <div className="relative z-10 mx-auto max-w-7xl">
-        <ReservationEventBanner />
         <ReservationHero />
 
         <div className="mt-14 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
