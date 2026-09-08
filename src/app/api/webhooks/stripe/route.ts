@@ -11,6 +11,7 @@ import {
 import { formatDurationHours } from '@/lib/duration';
 
 export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2026-04-22.dahlia',
@@ -406,7 +407,9 @@ export async function POST(req: Request) {
     const icsAttachmentBase64 = Buffer.from(icsContent, 'utf8').toString('base64');
 
     // --- SYNCHRONISATION GOOGLE CALENDAR ADMIN ---
-    let isAlreadyProcessed = false;
+    // Note : la création de l'événement sert de garde-fou anti-doublon pour le calendrier,
+    // mais ne doit jamais empêcher la tentative d'envoi des emails ci-dessous (sinon un
+    // timeout sur le premier essai fait échouer les emails pour toujours sur les retries Stripe).
     try {
       const calendar = createGoogleCalendarClient();
       const eventId = Buffer.from(session.id).toString('hex');
@@ -445,16 +448,10 @@ export async function POST(req: Request) {
         String(calendarError).includes('already exists');
 
       if (isDuplicate) {
-        console.log(`Réservation déjà traitée (événement existant pour la session Stripe ${session.id}).`);
-        isAlreadyProcessed = true;
+        console.log(`Événement calendrier déjà existant pour la session Stripe ${session.id} (probable retry Stripe).`);
       } else {
         console.error("Erreur lors de la création de l'événement Google Calendar admin :", calendarError);
       }
-    }
-
-    // Si la réservation a déjà été traitée, on s'arrête ici avec succès
-    if (isAlreadyProcessed) {
-      return NextResponse.json({ success: true, message: 'Réservation déjà traitée' });
     }
 
     // --- ENVOI MAIL ADMIN ---
