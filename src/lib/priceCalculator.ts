@@ -48,6 +48,10 @@ export function calculateBookingPrice(
   let basePrice = 0;
 
   switch (serviceTitle) {
+    case "Test Paiement Talaref":
+      // Service caché servant uniquement à tester le tunnel de paiement/emails.
+      return 0.5;
+
     case "Location Du Studio": {
       // Grille tarifaire fixe (tarif Jour)
       const dayRates: Record<number, number> = {

@@ -60,6 +60,20 @@ export const services: Service[] = [
   },
 ];
 
+// Service caché, jamais rendu dans ServiceSelector : accessible uniquement via le lien
+// de test direct (voir ReservationPage). Sert à vérifier le tunnel de paiement/emails
+// avec un montant réel minime.
+export const HIDDEN_TEST_SERVICE: Service = {
+  id: "test-paiement-talaref",
+  title: "Test Paiement Talaref",
+  eyebrow: "Test interne",
+  durationText: "Tarif fixe",
+  baseDuration: 1,
+  price: "0,50€",
+  description: "Service de test interne pour vérifier le tunnel de paiement. Ne pas réserver.",
+  includes: [],
+};
+
 export const publicEmailDomains = [
   "gmail.com",
   "yahoo.com",

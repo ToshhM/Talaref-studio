@@ -5,11 +5,21 @@ import { ReservationEventBanner } from "./ReservationEventBanner";
 import { ReservationHero } from "./ReservationHero";
 import { ServiceSelector } from "./ServiceSelector";
 import { BookingForm } from "./BookingForm";
-import { services } from "./data";
+import { services, HIDDEN_TEST_SERVICE } from "./data";
+
+const TEST_PAYMENT_QUERY_KEY = "internal_test";
+const TEST_PAYMENT_QUERY_VALUE = "talaref-0v5-2026";
 
 export function ReservationPage() {
   const [selectedServiceId, setSelectedServiceId] = useState(services[0].id);
   const [isNightTime, setIsNightTime] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get(TEST_PAYMENT_QUERY_KEY) === TEST_PAYMENT_QUERY_VALUE) {
+      setSelectedServiceId(HIDDEN_TEST_SERVICE.id);
+    }
+  }, []);
 
   useEffect(() => {
     const checkTime = () => {
@@ -39,7 +49,10 @@ export function ReservationPage() {
   }, []);
 
   const selectedService = useMemo(
-    () => services.find((service) => service.id === selectedServiceId) ?? services[0],
+    () =>
+      [...services, HIDDEN_TEST_SERVICE].find(
+        (service) => service.id === selectedServiceId
+      ) ?? services[0],
     [selectedServiceId]
   );
 
