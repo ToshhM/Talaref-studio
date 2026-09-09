@@ -9,6 +9,7 @@ import {
   safeHttpsUrl,
 } from '@/lib/bookingSecurity';
 import { formatDurationHours } from '@/lib/duration';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -291,6 +292,40 @@ export async function POST(req: Request) {
     const buttonColor = '#000000';
 
     const amountPaid = session.amount_total ? session.amount_total / 100 : 0;
+
+    // --- ENREGISTREMENT EN BASE (pour /admin/bookings) ---
+    // Upsert sur stripe_session_id : un retry Stripe met juste à jour la même ligne
+    // au lieu d'en créer une nouvelle ou de faire échouer la requête.
+    try {
+      const { error: bookingUpsertError } = await supabaseAdmin
+        .from('studio_bookings')
+        .upsert(
+          {
+            stripe_session_id: session.id,
+            first_name: firstName,
+            last_name: lastName,
+            email,
+            phone: phone || null,
+            siret: siret || null,
+            company_name: companyName || null,
+            service,
+            booking_date: date,
+            formatted_date: formattedDate || date,
+            slot,
+            duration: Number(duration) || 1,
+            payment_mode: paymentMode === 'deposit' ? 'deposit' : 'full',
+            amount_paid_cents: session.amount_total ?? 0,
+            message: message || null,
+          },
+          { onConflict: 'stripe_session_id' }
+        );
+
+      if (bookingUpsertError) {
+        console.error("Erreur lors de l'enregistrement de la réservation studio en base :", bookingUpsertError);
+      }
+    } catch (dbError) {
+      console.error("Erreur lors de l'enregistrement de la réservation studio en base :", dbError);
+    }
 
     // Récupérer le charge pour avoir le reçu Stripe
     let latestCharge: Stripe.Charge | null = null;

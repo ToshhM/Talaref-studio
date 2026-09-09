@@ -114,6 +114,72 @@ export interface Database {
         }
         Relationships: []
       }
+      studio_bookings: {
+        Row: {
+          id: string
+          stripe_session_id: string
+          first_name: string
+          last_name: string
+          email: string
+          phone: string | null
+          siret: string | null
+          company_name: string | null
+          service: string
+          booking_date: string
+          formatted_date: string | null
+          slot: string
+          duration: number
+          payment_mode: 'full' | 'deposit'
+          amount_paid_cents: number
+          message: string | null
+          status: 'confirmed' | 'cancelled'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          stripe_session_id: string
+          first_name: string
+          last_name: string
+          email: string
+          phone?: string | null
+          siret?: string | null
+          company_name?: string | null
+          service: string
+          booking_date: string
+          formatted_date?: string | null
+          slot: string
+          duration: number
+          payment_mode?: 'full' | 'deposit'
+          amount_paid_cents: number
+          message?: string | null
+          status?: 'confirmed' | 'cancelled'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          stripe_session_id?: string
+          first_name?: string
+          last_name?: string
+          email?: string
+          phone?: string | null
+          siret?: string | null
+          company_name?: string | null
+          service?: string
+          booking_date?: string
+          formatted_date?: string | null
+          slot?: string
+          duration?: number
+          payment_mode?: 'full' | 'deposit'
+          amount_paid_cents?: number
+          message?: string | null
+          status?: 'confirmed' | 'cancelled'
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>
@@ -124,3 +190,4 @@ export interface Database {
 
 export type Project = Database['public']['Tables']['projects']['Row']
 export type EventBooking = Database['public']['Tables']['event_bookings']['Row']
+export type StudioBooking = Database['public']['Tables']['studio_bookings']['Row']
