@@ -1,7 +1,5 @@
 import { BrevoClient } from '@getbrevo/brevo'
 
-const sender = { name: 'Talaref Studio', email: 'contact@talaref.co' }
-
 export function getBrevoClient() {
   const apiKey = process.env.BREVO_API_KEY?.trim()
 
@@ -13,7 +11,10 @@ export function getBrevoClient() {
 }
 
 export function getBrevoSender() {
-  return sender
+  return {
+    name: process.env.BREVO_SENDER_NAME?.trim() || 'Talaref Studio',
+    email: process.env.BREVO_SENDER_EMAIL?.trim() || 'contact@talaref.co',
+  }
 }
 
 export function getAdminEmail() {

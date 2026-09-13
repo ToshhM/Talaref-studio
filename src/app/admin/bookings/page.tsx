@@ -205,7 +205,7 @@ export default function AdminBookingsPage() {
     try {
       const response = await fetch("/api/admin/email-test", { method: "POST" });
       const data = await response.json().catch(() => null);
-      setTestMessage(response.ok ? "Mail de test envoyé à ADMIN_EMAIL." : data?.error || "Envoi impossible.");
+      setTestMessage(response.ok ? `Mail de test envoyé à ${data?.recipient || "ADMIN_EMAIL"}.` : data?.error || "Envoi impossible.");
     } catch {
       setTestMessage("Erreur de connexion.");
     } finally {
