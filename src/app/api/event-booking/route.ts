@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { getCongoEventDate } from '@/lib/eventDate'
-import { getBrevoClient, getBrevoSender } from '@/lib/brevo'
+import { getAdminEmail, getBrevoClient, getBrevoSender } from '@/lib/brevo'
 
 const SLOT_PATTERN = /^([01]\d|2[0-3]):(00|20|40)$/
 const PHONE_PATTERN = /^[+()0-9\s.-]{6,30}$/
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       try {
         await brevo.transactionalEmails.sendTransacEmail({
           sender: getBrevoSender(),
-          to: [{ email: 'contact@talaref.co' }],
+          to: [{ email: getAdminEmail() }],
           replyTo: { email, name: `${firstName} ${lastName}` },
           subject: `Shooting Day Congolais - ${firstName} ${lastName} - ${slot}`,
           htmlContent: `
