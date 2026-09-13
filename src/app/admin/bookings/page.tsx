@@ -66,6 +66,8 @@ export default function AdminBookingsPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
   const [pendingRowId, setPendingRowId] = useState<string | null>(null);
+  const [isSendingTest, setIsSendingTest] = useState(false);
+  const [testMessage, setTestMessage] = useState("");
 
   const loadBookings = async () => {
     setIsLoading(true);
@@ -174,6 +176,43 @@ export default function AdminBookingsPage() {
     }
   };
 
+  const resendEmails = async (row: UnifiedBooking) => {
+    setPendingRowId(row.id);
+    setRowErrors((prev) => ({ ...prev, [row.id]: "" }));
+
+    try {
+      const response = await fetch("/api/admin/bookings/resend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: row.type, id: row.id }),
+      });
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        setRowErrors((prev) => ({ ...prev, [row.id]: data?.error || "Envoi impossible." }));
+      }
+    } catch {
+      setRowErrors((prev) => ({ ...prev, [row.id]: "Erreur de connexion." }));
+    } finally {
+      setPendingRowId(null);
+    }
+  };
+
+  const sendTestEmail = async () => {
+    setIsSendingTest(true);
+    setTestMessage("");
+
+    try {
+      const response = await fetch("/api/admin/email-test", { method: "POST" });
+      const data = await response.json().catch(() => null);
+      setTestMessage(response.ok ? "Mail de test envoyé à ADMIN_EMAIL." : data?.error || "Envoi impossible.");
+    } catch {
+      setTestMessage("Erreur de connexion.");
+    } finally {
+      setIsSendingTest(false);
+    }
+  };
+
   const handleLogout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
     router.push("/admin/login");
@@ -191,13 +230,24 @@ export default function AdminBookingsPage() {
               Réservations
             </h1>
           </div>
-          <button
-            onClick={handleLogout}
-            className="rounded-full border border-white/10 bg-white/[0.06] px-5 py-2.5 text-xs font-black uppercase tracking-widest text-white/70 transition-colors hover:text-white"
-          >
-            Déconnexion
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            <button
+              onClick={sendTestEmail}
+              disabled={isSendingTest}
+              className="rounded-full border border-secondaire/40 bg-secondaire/10 px-5 py-2.5 text-xs font-black uppercase tracking-widest text-secondaire transition-colors hover:bg-secondaire/20 disabled:opacity-50"
+            >
+              {isSendingTest ? "Envoi..." : "Tester Brevo"}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="rounded-full border border-white/10 bg-white/[0.06] px-5 py-2.5 text-xs font-black uppercase tracking-widest text-white/70 transition-colors hover:text-white"
+            >
+              Déconnexion
+            </button>
+          </div>
         </div>
+
+        {testMessage && <p className="mb-6 text-secondaire">{testMessage}</p>}
 
         {errorMessage && !isLoading && (
           <p className="mb-6 text-red-400">{errorMessage}</p>
@@ -272,6 +322,14 @@ export default function AdminBookingsPage() {
                         </button>
                       </td>
                       <td className="px-5 py-4 text-right">
+                        <button
+                          type="button"
+                          disabled={isPending}
+                          onClick={() => resendEmails(row)}
+                          className="mr-2 rounded-full border border-secondaire/40 bg-secondaire/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-secondaire transition-colors hover:bg-secondaire/20 disabled:opacity-50"
+                        >
+                          Renvoyer les mails
+                        </button>
                         <button
                           type="button"
                           disabled={isPending}

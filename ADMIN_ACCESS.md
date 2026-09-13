@@ -20,7 +20,6 @@ Sans ça, toutes les routes (`/api/event-booking`, `/api/admin/event-bookings`) 
 | `ADMIN_SESSION_SECRET` | Secret pour signer le cookie de session admin (HMAC) | **Nouvelle — à ajouter** |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL du projet Supabase | Déjà utilisée (contact, projects) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Clé service role Supabase (accès admin, bypass RLS) | Déjà utilisée (Stripe webhook) |
-| `RESEND_API_KEY` | Envoi de l'email de notification à chaque réservation (optionnel — sans elle, la réservation fonctionne quand même, juste pas d'email) | Déjà utilisée (`/api/send`) |
 
 Choisir un `ADMIN_PASSWORD` fort et un `ADMIN_SESSION_SECRET` aléatoire (ex: `openssl rand -hex 32`).
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { BrevoClient } from '@getbrevo/brevo'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { getCongoEventDate } from '@/lib/eventDate'
+import { getBrevoClient, getBrevoSender } from '@/lib/brevo'
 
 const SLOT_PATTERN = /^([01]\d|2[0-3]):(00|20|40)$/
 const PHONE_PATTERN = /^[+()0-9\s.-]{6,30}$/
@@ -83,13 +83,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const apiKey = process.env.BREVO_API_KEY
-    if (apiKey) {
-      const brevo = new BrevoClient({ apiKey })
+    try {
+      const brevo = getBrevoClient()
 
       try {
         await brevo.transactionalEmails.sendTransacEmail({
-          sender: { name: 'Talaref Studio', email: 'contact@talaref.co' },
+          sender: getBrevoSender(),
           to: [{ email: 'contact@talaref.co' }],
           replyTo: { email, name: `${firstName} ${lastName}` },
           subject: `Shooting Day Congolais - ${firstName} ${lastName} - ${slot}`,
@@ -120,7 +119,7 @@ export async function POST(request: NextRequest) {
 
       try {
         await brevo.transactionalEmails.sendTransacEmail({
-          sender: { name: 'Talaref Studio', email: 'contact@talaref.co' },
+          sender: getBrevoSender(),
           to: [{ email, name: `${firstName} ${lastName}` }],
           subject: `Confirmation - Shooting Day Congolais du ${eventDate.label}`,
           htmlContent: `
@@ -145,6 +144,8 @@ export async function POST(request: NextRequest) {
       } catch (emailError) {
         console.error('Event booking client email error:', emailError)
       }
+    } catch (configurationError) {
+      console.error('Event booking Brevo configuration error:', configurationError)
     }
 
     return NextResponse.json({ success: true, id: inserted?.id })

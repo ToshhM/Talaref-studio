@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { BrevoClient } from '@getbrevo/brevo'
+import { getAdminEmail, getBrevoClient, getBrevoSender } from '@/lib/brevo'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,22 +15,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérification de la clé API
-    const apiKey = process.env.BREVO_API_KEY
-    if (!apiKey) {
-      console.error('BREVO_API_KEY is not configured')
+    let brevo
+    let adminEmail
+    try {
+      brevo = getBrevoClient()
+      adminEmail = getAdminEmail()
+    } catch (configurationError) {
+      console.error('Brevo configuration error:', configurationError)
       return NextResponse.json(
         { error: 'Configuration email manquante' },
         { status: 500 }
       )
     }
 
-    const brevo = new BrevoClient({ apiKey })
-
     // Envoi de l'email
     try {
       await brevo.transactionalEmails.sendTransacEmail({
-        sender: { name: 'Talaref Studio', email: 'contact@talaref.co' },
-        to: [{ email: 'contact@talaref.co' }],
+        sender: getBrevoSender(),
+        to: [{ email: adminEmail }],
         replyTo: { email, name },
         subject: `Nouveau message de ${name} - ${service}`,
         htmlContent: `

@@ -7,9 +7,15 @@ import {
 } from '@/lib/bookingSecurity';
 import { formatDurationHours } from '@/lib/duration';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-04-22.dahlia',
-});
+function getStripeClient() {
+  const secretKey = process.env.STRIPE_SECRET_KEY?.trim();
+
+  if (!secretKey) {
+    throw new Error('STRIPE_SECRET_KEY is not configured');
+  }
+
+  return new Stripe(secretKey, { apiVersion: '2026-04-22.dahlia' });
+}
 
 function formatAmountForMetadata(value: number): string {
   return value.toFixed(2);
@@ -17,6 +23,7 @@ function formatAmountForMetadata(value: number): string {
 
 export async function POST(req: Request) {
   try {
+    const stripe = getStripeClient();
     const body = await req.json();
     const booking = parseBookingInput(body);
     const captchaToken =

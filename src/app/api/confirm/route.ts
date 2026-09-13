@@ -3,12 +3,19 @@ import Stripe from 'stripe';
 
 export const runtime = 'nodejs';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-04-22.dahlia',
-});
+function getStripeClient() {
+  const secretKey = process.env.STRIPE_SECRET_KEY?.trim();
+
+  if (!secretKey) {
+    throw new Error('STRIPE_SECRET_KEY is not configured');
+  }
+
+  return new Stripe(secretKey, { apiVersion: '2026-04-22.dahlia' });
+}
 
 export async function POST(req: Request) {
   try {
+    const stripe = getStripeClient();
     const { sessionId } = await req.json();
 
     if (!sessionId) {

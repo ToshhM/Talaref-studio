@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { BrevoClient } from '@getbrevo/brevo';
 import { google } from 'googleapis';
 import {
   parseBookingMetadata,
@@ -10,18 +9,20 @@ import {
 } from '@/lib/bookingSecurity';
 import { formatDurationHours } from '@/lib/duration';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { getAdminEmail, getBrevoClient, getBrevoSender } from '@/lib/brevo';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-04-22.dahlia',
-});
+function getStripeClient() {
+  const secretKey = process.env.STRIPE_SECRET_KEY?.trim();
 
-// --- CONFIGURATION BREVO ---
-const brevo = new BrevoClient({
-  apiKey: process.env.BREVO_API_KEY!,
-});
+  if (!secretKey) {
+    throw new Error('STRIPE_SECRET_KEY is not configured');
+  }
+
+  return new Stripe(secretKey, { apiVersion: '2026-04-22.dahlia' });
+}
 
 // --- CONFIGURATION GOOGLE CALENDAR ---
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
@@ -199,6 +200,7 @@ function buildIcsContent(params: {
 }
 
 export async function POST(req: Request) {
+  const stripe = getStripeClient();
   const signature = req.headers.get('stripe-signature');
 
   if (!signature) {
@@ -491,6 +493,7 @@ export async function POST(req: Request) {
 
     // --- ENVOI MAIL ADMIN ---
     try {
+      const brevo = getBrevoClient();
       await brevo.transactionalEmails.sendTransacEmail({
         subject: `Nouvelle réservation : ${service} - ${firstName} ${lastName}`,
         htmlContent: `
@@ -523,8 +526,8 @@ export async function POST(req: Request) {
             </p>
           </div>
         `,
-        sender: { name: 'Talaref Studio', email: 'contact@talaref.co' },
-        to: [{ email: process.env.ADMIN_EMAIL! }],
+        sender: getBrevoSender(),
+        to: [{ email: getAdminEmail() }],
       });
     } catch (adminEmailError) {
       console.error("Erreur lors de l'envoi de l'e-mail administrateur via Brevo :", adminEmailError);
@@ -532,6 +535,7 @@ export async function POST(req: Request) {
 
     // --- ENVOI MAIL CLIENT ---
     try {
+      const brevo = getBrevoClient();
       await brevo.transactionalEmails.sendTransacEmail({
         subject: 'Confirmation de votre réservation - Talaref Studio',
         htmlContent: `
@@ -585,7 +589,7 @@ export async function POST(req: Request) {
             </div>
           </div>
         `,
-        sender: { name: 'Talaref Studio', email: 'contact@talaref.co' },
+        sender: getBrevoSender(),
         to: [{ email }],
         attachment: [
           {
