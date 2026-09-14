@@ -1,5 +1,7 @@
 import { findFormulaTierPrice } from "./photographerFormulas";
 
+export const NIGHT_SURCHARGE = 20;
+
 /**
  * Fonction utilitaire pour calculer le nombre d'heures de nuit (23h - 9h)
  * dans un créneau donné.
@@ -32,17 +34,13 @@ export function calculateBookingPrice(
   slot: string,
   isEnterprise: boolean = false
 ): number {
-  const nightHours = calculateNightHours(slot, duration);
-
-  // Pour les forfaits fixes (Podcast), on regarde juste si ça COMMENCE de nuit
-  const startHour = Number(slot.split(':')[0]);
-  const isNightStart = startHour >= 23 || startHour < 9;
+  const hasNightHours = calculateNightHours(slot, duration) > 0;
 
   // Formules avec photographe (CV LinkedIn, Polas, Book, Anniversaire, Corporate...) :
-  // grille de prix fixe par formule + durée, forfait Soir de +10€ si le créneau démarre de nuit.
+  // Grille de prix fixe par formule + durée, avec un forfait nuit unique de 20€.
   const formulaPrice = findFormulaTierPrice(serviceTitle, duration);
   if (formulaPrice !== null) {
-    return isNightStart ? formulaPrice + 10 : formulaPrice;
+    return hasNightHours ? formulaPrice + NIGHT_SURCHARGE : formulaPrice;
   }
 
   let basePrice = 0;
@@ -59,8 +57,7 @@ export function calculateBookingPrice(
       };
       basePrice = dayRates[duration] ?? duration * 40;
 
-      // Forfait Soir : +10€ fixe si le créneau démarre entre 23h et 9h
-      if (isNightStart) basePrice += 10;
+      if (hasNightHours) basePrice += NIGHT_SURCHARGE;
       break;
     }
 
@@ -68,11 +65,8 @@ export function calculateBookingPrice(
       // Forfait fixe : on check si c'est format long (> 2h) et si ça démarre de nuit
       const isLongFormat = duration > 2;
 
-      if (isNightStart) {
-        basePrice = isLongFormat ? 1090 : 600;
-      } else {
-        basePrice = isLongFormat ? 790 : 490;
-      }
+      basePrice = isLongFormat ? 790 : 490;
+      if (hasNightHours) basePrice += NIGHT_SURCHARGE;
       break;
     }
 

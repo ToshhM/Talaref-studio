@@ -75,7 +75,7 @@ export function BookingSummary({
           <p className="flex justify-between gap-4">
             <span>{hasFlatEveningSurcharge ? "Forfait Soir" : "Heures de nuit"}</span>
             <strong className="text-right text-secondaire">
-              {hasFlatEveningSurcharge ? "+10€" : `${selectedNightHours}h (+100€/h)`}
+              +20€
             </strong>
           </p>
         )}

@@ -469,15 +469,15 @@ export function BookingForm({ selectedService, selectedServiceId, isNightTime }:
             </span>
             <p className="text-white/80">
               {selectedService.title === "Location Du Studio" || isPhotographerService ? (
-                <span>Le créneau sélectionné démarre dans la plage nocturne (23h00 - 08h59), un forfait Soir de <strong>+10 €</strong> s&apos;applique automatiquement.</span>
+                <span>Une heure de votre prestation tombe dans la plage nocturne (23h00 - 08h59) : un forfait de nuit de <strong>+20 €</strong> s&apos;applique.</span>
               ) : isNightTime ? (
                 selectedNightHours > 0 ? (
-                  <span>Votre sélection inclut <strong>{selectedNightHours} heure{selectedNightHours > 1 ? "s" : ""}</strong> dans la plage nocturne (23h00 - 08h59) soumise à une majoration de <strong>100 €/h</strong>.</span>
+                  <span>Une heure de votre prestation tombe dans la plage nocturne (23h00 - 08h59) : un forfait de nuit de <strong>+20 €</strong> s&apos;applique.</span>
                 ) : (
-                  <span>La tarification nocturne est active de 23h00 à 08h59. Les heures réservées durant cette période font l&apos;objet d&apos;un ajustement de +100 €/h.</span>
+                  <span>La tarification nocturne est active de 23h00 à 08h59. Une prestation concernée entraîne un forfait de nuit de <strong>+20 €</strong>.</span>
                 )
               ) : (
-                <span>Le créneau sélectionné contient <strong>{selectedNightHours} heure{selectedNightHours > 1 ? "s" : ""}</strong> dans la plage nocturne (23h00 - 08h59). Une majoration de <strong>100 €/h</strong> s&apos;applique automatiquement à ces heures.</span>
+                <span>Une heure de votre prestation tombe dans la plage nocturne (23h00 - 08h59) : un forfait de nuit de <strong>+20 €</strong> s&apos;applique.</span>
               )}
             </p>
           </div>
