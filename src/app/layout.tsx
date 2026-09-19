@@ -32,6 +32,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <head>
+        <meta name="p:domain_verify" content="e54310e50c66cc71d795e63f9df4ba4e" />
         {/* Google Tag Manager */}
         <Script id="gtm-script" strategy="afterInteractive">
           {`
