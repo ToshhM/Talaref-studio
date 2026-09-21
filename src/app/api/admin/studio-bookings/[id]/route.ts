@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
+const SLOT_PATTERN = /^([01]\d|2[0-3]):(00|20|40)$/;
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -9,6 +12,24 @@ export async function PATCH(
   const body = await request.json().catch(() => ({}));
 
   const updates: Record<string, unknown> = {};
+
+  if (typeof body.bookingDate === "string") {
+    if (!DATE_PATTERN.test(body.bookingDate)) {
+      return NextResponse.json({ error: "Date invalide." }, { status: 400 });
+    }
+    updates.booking_date = body.bookingDate;
+  }
+
+  if (typeof body.slot === "string") {
+    if (!SLOT_PATTERN.test(body.slot)) {
+      return NextResponse.json({ error: "Créneau invalide." }, { status: 400 });
+    }
+    updates.slot = body.slot;
+  }
+
+  if (typeof body.message === "string") {
+    updates.message = body.message.trim().slice(0, 1000) || null;
+  }
 
   if (typeof body.status === "string") {
     if (!["confirmed", "cancelled"].includes(body.status)) {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAdminEmail, getBrevoClient, getBrevoSender } from '@/lib/brevo';
+import { getAdminEmail, getMailjetSender, sendMailjetEmail } from '@/lib/mailjet';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 type BookingType = 'studio' | 'congo';
@@ -48,7 +48,6 @@ export async function POST(request: Request) {
   }
 
   try {
-    const brevo = getBrevoClient();
     const adminEmail = getAdminEmail();
     const firstName = escapeHtml(booking.first_name);
     const lastName = escapeHtml(booking.last_name);
@@ -81,15 +80,16 @@ export async function POST(request: Request) {
         <p><strong>Téléphone :</strong> ${phone}</p>
       </div>`;
 
+    const sentAt = new Date().toISOString();
     const results = await Promise.allSettled([
-      brevo.transactionalEmails.sendTransacEmail({
-        sender: getBrevoSender(),
+      sendMailjetEmail({
+        sender: getMailjetSender(),
         to: [{ email: booking.email, name: `${booking.first_name} ${booking.last_name}` }],
         subject: 'Confirmation de votre réservation - Talaref Studio',
         htmlContent,
       }),
-      brevo.transactionalEmails.sendTransacEmail({
-        sender: getBrevoSender(),
+      sendMailjetEmail({
+        sender: getMailjetSender(),
         to: [{ email: adminEmail }],
         replyTo: { email: booking.email, name: `${booking.first_name} ${booking.last_name}` },
         subject: `Réservation - ${booking.first_name} ${booking.last_name}`,
@@ -98,6 +98,23 @@ export async function POST(request: Request) {
     ]);
 
     const failed = results.filter((result) => result.status === 'rejected').length;
+    const sentFields = results.reduce<Record<string, string>>((fields, result, index) => {
+      if (result.status === 'fulfilled') {
+        fields[index === 0 ? 'client_email_sent_at' : 'admin_email_sent_at'] = sentAt;
+      }
+      return fields;
+    }, {});
+
+    if (Object.keys(sentFields).length > 0) {
+      const { error: trackingError } = await supabaseAdmin
+        .from(table)
+        .update(sentFields)
+        .eq('id', id);
+
+      if (trackingError) {
+        console.error('Booking email tracking update error:', trackingError);
+      }
+    }
     if (failed > 0) {
       results.forEach((result) => {
         if (result.status === 'rejected') console.error('Booking resend email error:', result.reason);
@@ -108,9 +125,9 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ success: true });
-  } catch (resendError) {
-    console.error('Booking resend configuration error:', resendError);
-    return NextResponse.json({ error: 'Configuration Brevo incomplète.' }, { status: 500 });
+    return NextResponse.json({ success: true, sentAt });
+  } catch (mailjetError) {
+    console.error('Booking resend configuration error:', mailjetError);
+    return NextResponse.json({ error: 'Configuration Mailjet incomplète.' }, { status: 500 });
   }
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { getCongoEventDate } from '@/lib/eventDate'
-import { getAdminEmail, getBrevoClient, getBrevoSender } from '@/lib/brevo'
+import { getAdminEmail, getMailjetSender, sendMailjetEmail } from '@/lib/mailjet'
 
 const SLOT_PATTERN = /^([01]\d|2[0-3]):(00|20|40)$/
 const PHONE_PATTERN = /^[+()0-9\s.-]{6,30}$/
@@ -84,11 +84,9 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      const brevo = getBrevoClient()
-
       try {
-        await brevo.transactionalEmails.sendTransacEmail({
-          sender: getBrevoSender(),
+        await sendMailjetEmail({
+          sender: getMailjetSender(),
           to: [{ email: getAdminEmail() }],
           replyTo: { email, name: `${firstName} ${lastName}` },
           subject: `Shooting Day Congolais - ${firstName} ${lastName} - ${slot}`,
@@ -113,13 +111,17 @@ export async function POST(request: NextRequest) {
             </div>
           `,
         })
+        await supabaseAdmin
+          .from('event_bookings')
+          .update({ admin_email_sent_at: new Date().toISOString() })
+          .eq('id', inserted?.id)
       } catch (emailError) {
         console.error('Event booking admin email error:', emailError)
       }
 
       try {
-        await brevo.transactionalEmails.sendTransacEmail({
-          sender: getBrevoSender(),
+        await sendMailjetEmail({
+          sender: getMailjetSender(),
           to: [{ email, name: `${firstName} ${lastName}` }],
           subject: `Confirmation - Shooting Day Congolais du ${eventDate.label}`,
           htmlContent: `
@@ -141,11 +143,15 @@ export async function POST(request: NextRequest) {
             </div>
           `,
         })
+        await supabaseAdmin
+          .from('event_bookings')
+          .update({ client_email_sent_at: new Date().toISOString() })
+          .eq('id', inserted?.id)
       } catch (emailError) {
         console.error('Event booking client email error:', emailError)
       }
     } catch (configurationError) {
-      console.error('Event booking Brevo configuration error:', configurationError)
+      console.error('Event booking Mailjet configuration error:', configurationError)
     }
 
     return NextResponse.json({ success: true, id: inserted?.id })

@@ -82,6 +82,9 @@ export interface Database {
           event_date: string
           slot: string
           message: string | null
+          client_email_sent_at: string | null
+          admin_email_sent_at: string | null
+          review_email_sent_at: string | null
           status: 'confirmed' | 'cancelled'
           created_at: string
           updated_at: string
@@ -95,6 +98,9 @@ export interface Database {
           event_date: string
           slot: string
           message?: string | null
+          client_email_sent_at?: string | null
+          admin_email_sent_at?: string | null
+          review_email_sent_at?: string | null
           status?: 'confirmed' | 'cancelled'
           created_at?: string
           updated_at?: string
@@ -108,6 +114,9 @@ export interface Database {
           event_date?: string
           slot?: string
           message?: string | null
+          client_email_sent_at?: string | null
+          admin_email_sent_at?: string | null
+          review_email_sent_at?: string | null
           status?: 'confirmed' | 'cancelled'
           created_at?: string
           updated_at?: string
@@ -132,6 +141,9 @@ export interface Database {
           payment_mode: 'full' | 'deposit'
           amount_paid_cents: number
           message: string | null
+          client_email_sent_at: string | null
+          admin_email_sent_at: string | null
+          review_email_sent_at: string | null
           status: 'confirmed' | 'cancelled'
           created_at: string
           updated_at: string
@@ -153,6 +165,9 @@ export interface Database {
           payment_mode?: 'full' | 'deposit'
           amount_paid_cents: number
           message?: string | null
+          client_email_sent_at?: string | null
+          admin_email_sent_at?: string | null
+          review_email_sent_at?: string | null
           status?: 'confirmed' | 'cancelled'
           created_at?: string
           updated_at?: string
@@ -174,6 +189,9 @@ export interface Database {
           payment_mode?: 'full' | 'deposit'
           amount_paid_cents?: number
           message?: string | null
+          client_email_sent_at?: string | null
+          admin_email_sent_at?: string | null
+          review_email_sent_at?: string | null
           status?: 'confirmed' | 'cancelled'
           created_at?: string
           updated_at?: string

@@ -1,7 +1,7 @@
 -- Table for paid studio/photographer/podcast/formation bookings created via the
 -- Stripe checkout flow (src/app/api/webhooks/stripe/route.ts). Apply this in the
 -- Supabase SQL Editor. Until this table exists, these bookings are only ever
--- visible in the Google Calendar / Brevo emails, never in /admin/bookings.
+-- visible in the Google Calendar / email notifications, never in /admin/bookings.
 
 create table if not exists public.studio_bookings (
   id uuid primary key default gen_random_uuid(),
@@ -21,11 +21,19 @@ create table if not exists public.studio_bookings (
     check (payment_mode in ('full', 'deposit')),
   amount_paid_cents integer not null,
   message text,
+  client_email_sent_at timestamptz,
+  admin_email_sent_at timestamptz,
+  review_email_sent_at timestamptz,
   status text not null default 'confirmed'
     check (status in ('confirmed', 'cancelled')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.studio_bookings
+  add column if not exists client_email_sent_at timestamptz,
+  add column if not exists admin_email_sent_at timestamptz,
+  add column if not exists review_email_sent_at timestamptz;
 
 create index if not exists studio_bookings_booking_date_idx
   on public.studio_bookings (booking_date);

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAdminEmail, getBrevoClient, getBrevoSender } from '@/lib/brevo'
+import { getAdminEmail, getMailjetSender, sendMailjetEmail } from '@/lib/mailjet'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,13 +15,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Vérification de la clé API
-    let brevo
     let adminEmail
     try {
-      brevo = getBrevoClient()
       adminEmail = getAdminEmail()
     } catch (configurationError) {
-      console.error('Brevo configuration error:', configurationError)
+      console.error('Mailjet configuration error:', configurationError)
       return NextResponse.json(
         { error: 'Configuration email manquante' },
         { status: 500 }
@@ -30,8 +28,8 @@ export async function POST(request: NextRequest) {
 
     // Envoi de l'email
     try {
-      await brevo.transactionalEmails.sendTransacEmail({
-        sender: getBrevoSender(),
+      await sendMailjetEmail({
+        sender: getMailjetSender(),
         to: [{ email: adminEmail }],
         replyTo: { email, name },
         subject: `Nouveau message de ${name} - ${service}`,
@@ -57,7 +55,7 @@ export async function POST(request: NextRequest) {
         `,
       })
     } catch (error) {
-      console.error('Brevo error:', error)
+      console.error('Mailjet error:', error)
       return NextResponse.json(
         { error: 'Erreur lors de l\'envoi du message' },
         { status: 500 }

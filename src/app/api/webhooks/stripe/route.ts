@@ -9,7 +9,7 @@ import {
 } from '@/lib/bookingSecurity';
 import { formatDurationHours } from '@/lib/duration';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { getAdminEmail, getBrevoClient, getBrevoSender } from '@/lib/brevo';
+import { getAdminEmail, getMailjetSender, sendMailjetEmail } from '@/lib/mailjet';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -493,8 +493,7 @@ export async function POST(req: Request) {
 
     // --- ENVOI MAIL ADMIN ---
     try {
-      const brevo = getBrevoClient();
-      await brevo.transactionalEmails.sendTransacEmail({
+      await sendMailjetEmail({
         subject: `Nouvelle réservation : ${service} - ${firstName} ${lastName}`,
         htmlContent: `
           <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: ${bgColor}; color: ${textColor}; padding: 40px; text-align: center;">
@@ -526,17 +525,20 @@ export async function POST(req: Request) {
             </p>
           </div>
         `,
-        sender: getBrevoSender(),
+        sender: getMailjetSender(),
         to: [{ email: getAdminEmail() }],
       });
+      await supabaseAdmin
+        .from('studio_bookings')
+        .update({ admin_email_sent_at: new Date().toISOString() })
+        .eq('stripe_session_id', session.id);
     } catch (adminEmailError) {
-      console.error("Erreur lors de l'envoi de l'e-mail administrateur via Brevo :", adminEmailError);
+      console.error("Erreur lors de l'envoi de l'e-mail administrateur via Mailjet :", adminEmailError);
     }
 
     // --- ENVOI MAIL CLIENT ---
     try {
-      const brevo = getBrevoClient();
-      await brevo.transactionalEmails.sendTransacEmail({
+      await sendMailjetEmail({
         subject: 'Confirmation de votre réservation - Talaref Studio',
         htmlContent: `
           <div style="background-color: ${bgColor}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px 20px; color: ${textColor}; margin: 0;">
@@ -589,7 +591,7 @@ export async function POST(req: Request) {
             </div>
           </div>
         `,
-        sender: getBrevoSender(),
+        sender: getMailjetSender(),
         to: [{ email }],
         attachment: [
           {
@@ -598,8 +600,12 @@ export async function POST(req: Request) {
           },
         ],
       });
+      await supabaseAdmin
+        .from('studio_bookings')
+        .update({ client_email_sent_at: new Date().toISOString() })
+        .eq('stripe_session_id', session.id);
     } catch (clientEmailError) {
-      console.error("Erreur lors de l'envoi de l'e-mail de confirmation au client via Brevo :", clientEmailError);
+      console.error("Erreur lors de l'envoi de l'e-mail de confirmation au client via Mailjet :", clientEmailError);
     }
   }
 

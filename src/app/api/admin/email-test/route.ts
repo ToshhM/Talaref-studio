@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAdminEmail, getBrevoClient, getBrevoSender } from '@/lib/brevo';
+import { getAdminEmail, getMailjetSender, sendMailjetEmail } from '@/lib/mailjet';
 
 export async function POST() {
   const adminEmail = process.env.ADMIN_EMAIL?.trim();
@@ -12,16 +12,15 @@ export async function POST() {
   }
 
   try {
-    const brevo = getBrevoClient();
     const configuredAdminEmail = getAdminEmail();
 
-    await brevo.transactionalEmails.sendTransacEmail({
-      sender: getBrevoSender(),
+    await sendMailjetEmail({
+      sender: getMailjetSender(),
       to: [{ email: configuredAdminEmail }],
-      subject: 'Test email Brevo - Talaref Studio',
+      subject: 'Test email Mailjet - Talaref Studio',
       htmlContent: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>Test Brevo réussi</h2>
+          <h2>Test Mailjet réussi</h2>
           <p>La configuration email de Talaref Studio fonctionne correctement.</p>
           <p>Ce message a été envoyé depuis la page administration, sans paiement.</p>
         </div>`,
@@ -29,25 +28,14 @@ export async function POST() {
 
     return NextResponse.json({ success: true, recipient: configuredAdminEmail });
   } catch (error) {
-    console.error('Brevo test email error:', error);
-    const brevoError = error as {
-      code?: string;
-      message?: string;
-      body?: { code?: string; message?: string };
-      response?: { body?: { code?: string; message?: string } };
-    };
-    const code = brevoError.body?.code || brevoError.response?.body?.code || brevoError.code;
-    const message =
-      brevoError.body?.message ||
-      brevoError.response?.body?.message ||
-      brevoError.message;
+    console.error('Mailjet test email error:', error);
+    const mailjetError = error as { message?: string };
 
     return NextResponse.json(
       {
         error: [
-          'Brevo a refusé le mail de test.',
-          code ? `Code : ${code}.` : '',
-          message ? `Détail : ${message}` : '',
+          'Mailjet a refusé le mail de test.',
+          mailjetError.message ? `Détail : ${mailjetError.message}` : '',
         ]
           .filter(Boolean)
           .join(' '),

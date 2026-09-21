@@ -10,11 +10,19 @@ create table if not exists public.event_bookings (
   event_date date not null,
   slot text not null,
   message text,
+  client_email_sent_at timestamptz,
+  admin_email_sent_at timestamptz,
+  review_email_sent_at timestamptz,
   status text not null default 'confirmed'
     check (status in ('confirmed', 'cancelled')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.event_bookings
+  add column if not exists client_email_sent_at timestamptz,
+  add column if not exists admin_email_sent_at timestamptz,
+  add column if not exists review_email_sent_at timestamptz;
 
 -- Prevent two confirmed bookings from occupying the same slot on the same day.
 create unique index if not exists event_bookings_active_slot_unique
