@@ -26,8 +26,8 @@ function toMailjetRecipient(recipient: MailRecipient) {
 }
 
 function getMailjetCredentials() {
-  const apiKey = process.env.mailjet_api_key?.trim()
-  const apiSecret = process.env.mailjet_api_secret?.trim()
+  const apiKey = (process.env.MAILJET_API_KEY || process.env.mailjet_api_key)?.trim()
+  const apiSecret = (process.env.MAILJET_API_SECRET || process.env.mailjet_api_secret)?.trim()
 
   if (!apiKey || !apiSecret) {
     throw new Error('Mailjet credentials are not configured')
