@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { ReservationPage } from "@/components/Reservation";
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/reservation' },
   title: "Réservation | TALAREF STUDIO",
   description: "Réservez une prestation photo ou vidéo avec TALAREF STUDIO.",
 };

@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.talaref.co"),
   title: "TALAREF STUDIO | La forge de vos idées",
   description: "Ingénieur digital & Créateur de contenu - Photo, Vidéo, Sites Web, Design et Gestion de Projet. Basé à Paris.",
   keywords: ["TALAREF", "Toshiro MPIKA", "Photo", "Vidéo", "Site Web", "Design", "Paris", "Freelance", "Drone"],
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "TALAREF STUDIO | La forge de vos idées",
     description: "Ingénieur digital & Créateur de contenu - Photo, Vidéo, Sites Web, Design et Gestion de Projet.",
-    url: "https://toshh.fr",
+    url: "https://www.talaref.co",
     siteName: "TALAREF STUDIO",
     locale: "fr_FR",
     type: "website",

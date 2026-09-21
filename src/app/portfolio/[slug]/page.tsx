@@ -21,8 +21,10 @@ export async function generateMetadata({
 
   return {
     title: `${project.title} | TALAREF STUDIO`,
+    alternates: { canonical: `/portfolio/${project.slug}` },
     description: project.description,
     openGraph: {
+      url: `/portfolio/${project.slug}`,
       title: project.title,
       description: project.description,
       images: project.featured_image ? [project.featured_image] : [],

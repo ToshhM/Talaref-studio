@@ -3,6 +3,11 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { ContactForm } from '@/components/ContactForm';
 import { WaveBanner } from '@/components/WaveBanner';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+};
 
 export default function Home() {
   return (

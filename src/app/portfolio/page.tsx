@@ -5,6 +5,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/portfolio' },
   title: 'Portfolio | TALAREF STUDIO',
   description: 'Découvrez nos projets en photographie, développement web, design et gestion de projet.',
 }
