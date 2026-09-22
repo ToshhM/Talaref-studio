@@ -1,0 +1,361 @@
+/* ============================================================
+   TALAREF — agence photo & vidéo
+   Feuille de style de la page d'accueil.
+
+   Codes repris de talaref.co : fond #001829, accent #B8CE20, Inter.
+   Monde visuel unique et assumé : un site de marque ne bascule pas
+   selon le réglage du visiteur, donc tout est peint explicitement.
+
+   Toutes les classes sont préfixées « tl- » et tout est enfermé
+   dans .tl-page : le fichier peut être importé dans un projet qui
+   a déjà ses propres styles, y compris Tailwind, sans rien casser.
+   ============================================================ */
+
+.tl-page{
+  --nuit:#001829;
+  --nuit-2:#012639;
+  --nuit-3:#01334b;
+  --ligne:rgba(255,255,255,.13);
+  --ligne-forte:rgba(255,255,255,.26);
+  --lime:#b8ce20;
+  --lime-clair:#d3e84a;
+  --blanc:#ffffff;
+  --doux:rgba(255,255,255,.66);
+  --doux-2:rgba(255,255,255,.45);
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --rail:1240px;
+}
+
+.tl-page *{box-sizing:border-box;min-width:0}
+
+/* Conteneur de page : on ne touche pas au <body> du projet hote. */
+.tl-page{
+  background:var(--nuit);
+  color:var(--blanc);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+.tl-page img{max-width:100%;display:block}
+.tl-page a{color:inherit}
+.tl-page ::selection{background:var(--lime);color:var(--nuit)}
+.tl-page :focus-visible{outline:2px solid var(--lime);outline-offset:3px;border-radius:4px}
+.tl-page{scroll-behavior:smooth}
+
+@media (prefers-reduced-motion:reduce){
+  .tl-page{scroll-behavior:auto}
+  .tl-page *,.tl-page *::before,.tl-page *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+.tl-rail{width:100%;max-width:var(--rail);margin-inline:auto;padding-inline:20px}
+.tl-bande{padding-block:clamp(56px,7vw,96px)}
+.tl-bande--fil{border-top:1px solid var(--ligne)}
+
+.tl-page h1,.tl-page h2,.tl-page h3{margin:0;font-weight:800;letter-spacing:0;line-height:1.03;text-wrap:balance}
+.tl-page h1{font-size:4.5rem;letter-spacing:0}
+.tl-page h2{font-size:2.75rem}
+.tl-page h3{font-size:1.15rem;font-weight:700;letter-spacing:0;line-height:1.25}
+.tl-page p{margin:0}
+
+.tl-sur-titre{
+  display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:0;
+  text-transform:uppercase;color:var(--lime);margin:0;
+}
+.tl-lead{font-size:1.1rem;color:var(--doux);max-width:60ch;text-wrap:pretty}
+.tl-mini{font-size:.82rem;color:var(--doux-2)}
+
+.tl-tete{display:flex;flex-direction:column;gap:14px;margin-bottom:clamp(30px,4vw,48px)}
+
+/* ---------- boutons ---------- */
+.tl-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  font-size:.94rem;font-weight:600;text-decoration:none;
+  padding:13px 24px;border-radius:999px;border:1px solid transparent;
+  transition:background-color .18s,border-color .18s,color .18s;cursor:pointer;
+}
+.tl-btn--lime{background:var(--lime);color:var(--nuit)}
+.tl-btn--lime:hover{background:var(--lime-clair)}
+.tl-btn--fil{border-color:var(--ligne-forte);color:var(--blanc)}
+.tl-btn--fil:hover{border-color:var(--lime);color:var(--lime)}
+.tl-btn--sm{padding:9px 18px;font-size:.86rem}
+
+/* ---------- entête ---------- */
+.tl-entete{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:60;
+  background:rgba(0,24,41,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--ligne);
+}
+.tl-entete__in{display:flex;align-items:center;gap:16px;padding-block:12px}
+.tl-marque{display:flex;align-items:center;gap:10px;text-decoration:none;white-space:nowrap}
+.tl-marque__t{
+  width:30px;height:30px;border-radius:9px;background:var(--lime);color:var(--nuit);
+  display:grid;place-items:center;font-weight:900;font-size:1rem;letter-spacing:0;
+}
+.tl-marque__n{font-weight:800;letter-spacing:0;font-size:1.02rem}
+.tl-marque__n i{font-style:normal;color:var(--lime)}
+.tl-nav{display:flex;gap:2px;margin-left:auto}
+.tl-nav a{font-size:.9rem;color:var(--doux);text-decoration:none;padding:8px 12px;border-radius:999px;transition:color .15s,background-color .15s}
+.tl-nav a:hover{color:var(--blanc);background:rgba(255,255,255,.06)}
+.tl-nav a.tl-est-web{color:var(--lime)}
+@media(max-width:900px){.tl-nav{display:none}.tl-entete__in{justify-content:space-between}}
+
+/* ---------- média (emplacements à remplir) ---------- */
+.tl-media{
+  position:relative;overflow:hidden;border-radius:8px;
+  background:
+    repeating-linear-gradient(135deg,rgba(255,255,255,.028) 0 10px,transparent 10px 20px),
+    var(--nuit-2);
+  border:1px solid var(--ligne);
+  display:grid;place-items:center;text-align:center;padding:14px;
+}
+.tl-media__tag{
+  font-size:.66rem;font-weight:700;letter-spacing:0;text-transform:uppercase;
+  color:var(--doux-2);line-height:1.5;
+}
+.tl-media--169{aspect-ratio:16/9}
+.tl-media--916{aspect-ratio:9/16}
+.tl-media--11{aspect-ratio:1}
+.tl-media--43{aspect-ratio:4/3}
+
+.tl-play{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:52px;height:52px;border-radius:50%;background:var(--lime);
+  display:grid;place-items:center;
+}
+.tl-play svg{width:20px;height:20px;fill:var(--nuit);margin-left:3px}
+
+/* ---------- hero ---------- */
+.tl-hero{padding-block:clamp(40px,6vw,76px) clamp(36px,4vw,56px)}
+.tl-hero__grille{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(28px,4vw,56px);align-items:center}
+@media(max-width:940px){.tl-hero__grille{grid-template-columns:1fr}}
+.tl-hero h1{margin:16px 0 22px}
+.tl-hero h1 b{color:var(--lime);font-weight:800}
+.tl-hero__actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.tl-hero__note{margin-top:16px;font-size:.84rem;color:var(--doux-2)}
+
+.tl-mosaique{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:12px}
+.tl-mosaique .tl-media:nth-child(1){grid-column:1/-1}
+
+/* ---------- marquee logos ---------- */
+.tl-defile{overflow:hidden;position:relative;padding-block:22px;border-block:1px solid var(--ligne);background:var(--nuit-2)}
+.tl-defile::before,.tl-defile::after{
+  content:"";position:absolute;top:0;bottom:0;width:90px;z-index:2;pointer-events:none;
+}
+.tl-defile::before{left:0;background:linear-gradient(90deg,var(--nuit-2),transparent)}
+.tl-defile::after{right:0;background:linear-gradient(270deg,var(--nuit-2),transparent)}
+.tl-defile__piste{display:flex;width:max-content;gap:56px;animation:tl-glisse 42s linear infinite}
+.tl-defile:hover .tl-defile__piste{animation-play-state:paused}
+.tl-defile__piste span{
+  font-size:1.2rem;font-weight:700;letter-spacing:0;
+  color:rgba(255,255,255,.42);white-space:nowrap;
+}
+@keyframes tl-glisse{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- formats demandés ---------- */
+.tl-formats{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+.tl-format{background:var(--nuit-2);border:1px solid var(--ligne);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.tl-format .tl-media{border:0;border-radius:0}
+.tl-format__txt{padding:20px 20px 24px;display:flex;flex-direction:column;gap:9px;flex:1}
+.tl-format__txt p{font-size:.92rem;color:var(--doux)}
+.tl-format__pastille{
+  align-self:flex-start;font-size:.66rem;font-weight:700;letter-spacing:0;text-transform:uppercase;
+  color:var(--nuit);background:var(--lime);padding:4px 9px;border-radius:999px;
+}
+
+/* ---------- études de cas : onglets + carrousel ---------- */
+.tl-onglets{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:22px;scrollbar-width:thin}
+.tl-onglet{
+  flex:0 0 auto;font-family:inherit;font-size:.82rem;font-weight:600;letter-spacing:0;text-transform:uppercase;
+  color:var(--doux);background:transparent;border:1px solid var(--ligne);border-radius:999px;
+  padding:9px 18px;cursor:pointer;transition:all .18s;white-space:nowrap;
+}
+.tl-onglet:hover{color:var(--blanc);border-color:var(--ligne-forte)}
+.tl-onglet[aria-selected="true"]{background:var(--lime);color:var(--nuit);border-color:var(--lime)}
+
+.tl-cas{
+  background:var(--nuit-2);border:1px solid var(--ligne);border-radius:8px;
+  padding:clamp(20px,3vw,34px);
+  display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(22px,3vw,40px);
+}
+@media(max-width:900px){.tl-cas{grid-template-columns:1fr}}
+.tl-cas__txt{display:flex;flex-direction:column;gap:14px}
+.tl-cas__txt h3{font-size:1.75rem;font-weight:800}
+.tl-cas__txt .tl-lead{font-size:.97rem}
+.tl-cas__kpi{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+.tl-kpi{background:var(--nuit-3);border:1px solid var(--ligne);border-radius:12px;padding:12px 16px;min-width:130px}
+.tl-kpi b{display:block;font-size:1.45rem;font-weight:800;letter-spacing:0;color:var(--lime);font-variant-numeric:tabular-nums;line-height:1.1}
+.tl-kpi span{font-size:.76rem;color:var(--doux-2);line-height:1.4;display:block;margin-top:3px}
+
+/* carrousel */
+.tl-carrousel{position:relative}
+.tl-carrousel__piste{
+  display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;
+  scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth;
+}
+.tl-carrousel__piste::-webkit-scrollbar{display:none}
+.tl-carrousel__piste > *{flex:0 0 68%;scroll-snap-align:start}
+@media(min-width:700px){.tl-carrousel__piste > *{flex:0 0 46%}}
+.tl-carrousel__nav{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.tl-rond{
+  width:38px;height:38px;border-radius:50%;border:1px solid var(--ligne-forte);
+  background:transparent;color:var(--blanc);cursor:pointer;display:grid;place-items:center;
+  transition:all .18s;font-family:inherit;
+}
+.tl-rond:hover{background:var(--lime);color:var(--nuit);border-color:var(--lime)}
+.tl-rond svg{width:16px;height:16px;fill:currentColor}
+
+/* ---------- vidéos ---------- */
+/* auto-fill + largeur plafonnée : avec une seule vidéo, "auto-fit, 1fr"
+   étirait la carte sur toute la largeur du rail. Ici la carte garde une
+   taille de vignette (façon talaref.media) quel que soit le nombre de vidéos. */
+.tl-videos{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,210px));gap:16px}
+.tl-video-carte{position:relative;text-decoration:none;display:block}
+.tl-video-carte .tl-media{transition:transform .22s}
+.tl-video-carte:hover .tl-media{transform:translateY(-4px)}
+.tl-video-carte__lib{margin-top:10px;font-size:.88rem;font-weight:600}
+.tl-video-carte__sub{font-size:.78rem;color:var(--doux-2)}
+
+/* ---------- méthode ---------- */
+.tl-etapes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.tl-etape{border-top:2px solid var(--lime);padding-top:18px;display:flex;flex-direction:column;gap:9px}
+.tl-etape__n{font-size:.7rem;font-weight:800;letter-spacing:0;color:var(--lime)}
+.tl-etape p{font-size:.91rem;color:var(--doux)}
+
+/* ---------- secteurs ---------- */
+.tl-secteurs{display:flex;flex-wrap:wrap;gap:10px}
+.tl-secteurs a{
+  text-decoration:none;font-size:.92rem;font-weight:500;
+  border:1px solid var(--ligne);border-radius:999px;padding:11px 20px;color:var(--doux);
+  transition:all .18s;
+}
+.tl-secteurs a:hover{border-color:var(--lime);color:var(--lime)}
+
+/* ---------- témoignages ---------- */
+.tl-temoins{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tl-temoin{
+  background:var(--nuit-2);border:1px dashed var(--ligne-forte);border-radius:8px;padding:22px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.tl-temoin p{font-size:.85rem;color:var(--doux-2);line-height:1.6}
+.tl-temoin footer{font-size:.78rem;color:var(--doux-2);border-top:1px solid var(--ligne);padding-top:12px}
+
+/* ---------- appel ---------- */
+.tl-appel{
+  background:var(--lime);color:var(--nuit);border-radius:8px;
+  padding:clamp(30px,5vw,56px);
+  display:flex;flex-wrap:wrap;gap:26px;align-items:center;justify-content:space-between;
+}
+.tl-appel h2{color:var(--nuit);max-width:17ch}
+.tl-appel p{color:rgba(0,24,41,.72);max-width:44ch;margin-top:12px;font-size:.98rem}
+.tl-btn--nuit{background:var(--nuit);color:var(--blanc)}
+.tl-btn--nuit:hover{background:#012f47}
+
+/* ---------- sur mesure ---------- */
+.tl-mesure{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.tl-mesure div{background:var(--nuit-2);border:1px solid var(--ligne);border-radius:8px;padding:22px}
+.tl-mesure h3{margin-bottom:8px}
+.tl-mesure p{font-size:.9rem;color:var(--doux)}
+
+/* ---------- faq ---------- */
+.tl-faq{max-width:80ch;border-top:1px solid var(--ligne)}
+.tl-faq details{border-bottom:1px solid var(--ligne)}
+.tl-faq summary{
+  cursor:pointer;padding:18px 0;font-weight:600;list-style:none;
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+}
+.tl-faq summary::-webkit-details-marker{display:none}
+.tl-faq summary::after{content:"+";color:var(--lime);font-size:1.3rem;font-weight:400;line-height:1}
+.tl-faq details[open] summary::after{content:"–"}
+.tl-faq details p{padding-bottom:18px;color:var(--doux);font-size:.93rem;max-width:68ch}
+
+/* ---------- renvoi page web ---------- */
+.tl-renvoi{
+  border:1px solid var(--lime);border-radius:8px;padding:clamp(24px,3.5vw,38px);
+  display:flex;flex-wrap:wrap;gap:22px;align-items:center;justify-content:space-between;
+  background:linear-gradient(180deg,rgba(184,206,32,.07),transparent);
+}
+
+/* ---------- note prototype ---------- */
+.tl-note{
+  border-left:2px solid var(--lime);padding:4px 0 4px 14px;margin-top:20px;
+  font-size:.82rem;line-height:1.65;color:var(--doux-2);max-width:74ch;
+}
+
+/* ---------- pied ---------- */
+.tl-pied{border-top:1px solid var(--ligne);padding-block:44px 30px;background:var(--nuit-2)}
+.tl-pied__g{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:30px}
+.tl-pied h4{margin:0 0 12px;font-size:.7rem;font-weight:700;letter-spacing:0;text-transform:uppercase;color:var(--doux-2)}
+.tl-pied ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.tl-pied a,.tl-pied li{font-size:.9rem;color:var(--doux);text-decoration:none}
+.tl-pied a:hover{color:var(--lime)}
+.tl-pied__slogan{font-size:1.05rem;font-weight:700;line-height:1.3;max-width:20ch;letter-spacing:0}
+.tl-pied__bas{margin-top:34px;padding-top:18px;border-top:1px solid var(--ligne);font-size:.78rem;color:var(--doux-2)}
+
+/* Integration into the existing site. */
+.tl-page section[id],.tl-page [id="contact"],.tl-page [id="expertise"]{scroll-margin-top:100px}
+.tl-page .tl-btn--lime{color:var(--nuit)}
+.tl-page .tl-btn--nuit{color:white}
+.tl-btn{justify-content:center;min-height:44px;text-align:center}
+.tl-btn svg{flex-shrink:0}
+.tl-hero{position:relative;isolation:isolate;min-height:620px;padding:64px 0 72px;display:flex;align-items:center;overflow:hidden}
+.tl-hero__image{object-fit:cover;object-position:center 42%;z-index:-2}
+.tl-hero__voile{position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(0,10,17,.93),rgba(0,10,17,.74) 30%,rgba(0,10,17,.12) 72%)}
+.tl-hero__contenu{position:relative}
+.tl-hero h1{font-size:5rem;max-width:9ch;line-height:.95;margin:20px 0}
+.tl-hero h1 span{display:block;color:var(--lime)}
+.tl-hero__promesse{font-size:1.5rem;font-weight:600;max-width:26ch;line-height:1.3}
+.tl-hero .tl-lead{max-width:39ch;margin-top:16px;color:rgba(255,255,255,.88)}
+.tl-hero .tl-hero__note{margin-top:20px;color:rgba(255,255,255,.78);font-size:.8rem}
+.tl-hero__credit{position:absolute;bottom:18px;right:24px;font-size:.7rem;color:white}
+.tl-menu{display:none;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0;border:1px solid var(--ligne);border-radius:6px;background:transparent;color:white}
+.tl-cas{background:none;border:0;border-radius:0;padding:0}
+.tl-cas--texte{grid-template-columns:1fr;max-width:900px;min-height:285px}
+.tl-kpi{background:none;border:0;border-radius:0;border-left:2px solid var(--lime);padding:8px 16px}
+.tl-rond svg{fill:none}
+.tl-carrousel__piste--unique > *{flex-basis:100%}
+.tl-carrousel__piste .tl-media img{object-fit:contain!important}
+.tl-appel{border-radius:0}
+.tl-mesure div{background:none;border:0;border-radius:0;border-top:1px solid var(--ligne-forte);padding:22px 0}
+.tl-renvoi{border-radius:0;border:0;border-block:1px solid var(--ligne);background:none;padding-inline:0}
+.tl-contact{background:#eef1ed;color:#142b32}
+.tl-contact .tl-sur-titre{color:#52630b}
+.tl-contact h2{margin:18px 0 22px}
+.tl-contact .tl-lead{color:#45565b}
+.tl-contact__grille{display:grid;grid-template-columns:1fr 1fr;gap:72px}
+.tl-contact__tel{display:flex;align-items:center;gap:10px;font-weight:700;margin:28px 0 8px;font-size:1.2rem}
+.tl-formulaire{display:flex;flex-direction:column;gap:18px}
+.tl-formulaire__ligne{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.tl-formulaire label{display:flex;flex-direction:column;gap:7px;font-size:.85rem;font-weight:600}
+.tl-formulaire input,.tl-formulaire select,.tl-formulaire textarea{width:100%;padding:12px;border:1px solid #acb8b8;background:white;color:#142b32;border-radius:5px;font:inherit;font-weight:400;min-height:48px}
+.tl-formulaire textarea{resize:vertical}
+.tl-formulaire .tl-mini{color:#526165}
+.tl-formulaire__erreur{color:#9c2020;font-size:.9rem}
+.tl-formulaire button:disabled{opacity:.65;cursor:wait}
+.tl-contact__succes{min-height:330px;display:flex;flex-direction:column;gap:20px;align-items:flex-start;justify-content:center}
+.tl-contact__succes .tl-btn{color:#142b32;border-color:#8a9c9d}
+.tl-spin{animation:tl-tourne 1s linear infinite}
+@keyframes tl-tourne{to{transform:rotate(360deg)}}
+@media(min-width:1600px){.tl-hero{min-height:680px}}
+@media(max-width:1100px){
+ .tl-nav{display:none}.tl-menu{display:flex}.tl-entete__in>.tl-btn{margin-left:auto}
+ .tl-nav--ouverte{display:flex;position:absolute;left:0;right:0;top:100%;flex-direction:column;background:var(--nuit);padding:16px 20px;border-bottom:1px solid var(--ligne)}
+ .tl-nav--ouverte a{padding:12px;border-radius:4px}
+ .tl-contact__grille{gap:36px}
+}
+@media(max-width:700px){
+ .tl-page h2{font-size:2rem}.tl-page h3{font-size:1.2rem}
+ .tl-hero{min-height:620px;padding:36px 0 58px}
+ .tl-hero h1{font-size:3.75rem}.tl-hero__promesse{font-size:1.25rem}
+ .tl-hero__image{object-position:57% center}
+ .tl-hero__voile{background:linear-gradient(90deg,rgba(0,10,17,.85),rgba(0,10,17,.45))}
+ .tl-hero .tl-lead{max-width:32ch;font-size:1rem}
+ .tl-hero__actions{gap:10px;margin-top:22px}
+ .tl-hero__actions .tl-btn{font-size:.85rem;padding:12px 17px}
+ .tl-entete__in{gap:8px;padding-inline:16px}.tl-marque{gap:6px}.tl-marque__n{font-size:.8rem}.tl-marque__t{display:none}
+ .tl-entete__in>.tl-btn{font-size:.73rem;padding:9px 11px}
+ .tl-contact__grille{grid-template-columns:1fr}.tl-formulaire__ligne{grid-template-columns:1fr}
+ .tl-cas--texte{min-height:0}.tl-appel{padding:28px 22px}
+ .tl-formats{grid-template-columns:1fr}
+}

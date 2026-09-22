@@ -1,45 +1,59 @@
-import { ExpertiseDeployment } from '@/components/Expertise';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { ContactForm } from '@/components/ContactForm';
-import { WaveBanner } from '@/components/WaveBanner';
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
+import "@/styles/home.css";
+
+import { SiteHeader } from "@/components/Home/site-header";
+import { Hero } from "@/components/Home/hero";
+import { LogoMarquee } from "@/components/Home/logo-marquee";
+import { Formats } from "@/components/Home/formats";
+import { Realisations } from "@/components/Home/realisations";
+import { Videos } from "@/components/Home/videos";
+import { Methode } from "@/components/Home/methode";
+import { AppelMilieu } from "@/components/Home/appel-milieu";
+import { Secteurs } from "@/components/Home/secteurs";
+import { SurMesure } from "@/components/Home/sur-mesure";
+import { RenvoiWeb } from "@/components/Home/renvoi-web";
+import { Faq } from "@/components/Home/faq";
+import { AppelFinal } from "@/components/Home/appel-final";
+import { SiteFooter } from "@/components/Home/site-footer";
 
 export const metadata: Metadata = {
-  alternates: { canonical: '/' },
+  alternates: { canonical: "/" },
+  title: "TALAREF — Agence photo & vidéo à Levallois-Perret",
+  description:
+    "Récaps d'événement, interviews et campagnes. Vingt-neuf personnes, un studio ouvert 24h/24, une équipe accréditée PSG et Fashion Week — et les chiffres après la livraison.",
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    siteName: "TALAREF",
+    url: "https://www.talaref.co",
+    images: [{ url: "/images/home/monela-campagne.jpg", width: 1280, height: 853, alt: "Campagne Monela Hair par TALAREF" }],
+    title: "TALAREF — Agence photo & vidéo",
+    description:
+      "Votre événement mérite mieux qu'un résumé flou. On tourne, on monte, on livre — puis on mesure.",
+  },
 };
 
-export default function Home() {
+export default function PageAccueil() {
   return (
-    <div className="min-h-screen bg-background text-white selection:bg-secondaire selection:text-background">
-      <Header />
-      <main>
-        <WaveBanner />
+    <div className="tl-page">
+      <SiteHeader />
 
-        {/* The Animated Deployment Section */}
-        <ExpertiseDeployment />
-
-        {/* Impact Stats */}
-        <section className="py-40 bg-background text-center px-6 relative z-10">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="p-12 bg-principale/10 rounded-[3rem] border border-white/5 hover:border-secondaire/20 transition-colors group">
-              <span className="block text-6xl font-black text-secondaire mb-4 group-hover:scale-110 transition-transform">+100</span>
-              <span className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-black">projets réalisés </span>
-            </div>
-            <div className="p-12 bg-principale/10 rounded-[3rem] border border-white/5 hover:border-secondaire/20 transition-colors group">
-              <span className="block text-6xl font-black text-white mb-4 group-hover:scale-110 transition-transform">4 </span>
-              <span className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-black">domaines d&apos;expertise</span>
-            </div>
-            <div className="p-12 bg-principale/10 rounded-[3rem] border border-white/5 hover:border-secondaire/20 transition-colors group">
-              <span className="block text-6xl font-black text-secondaire mb-4 group-hover:scale-110 transition-transform">90%</span>
-              <span className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-black">Satisfaction client</span>
-            </div>
-          </div>
-        </section>
-
-        <ContactForm />
+      <main id="contenu">
+        <Hero />
+        <LogoMarquee />
+        <Formats />
+        <Realisations />
+        <Videos />
+        <Methode />
+        <AppelMilieu />
+        <Secteurs />
+        <SurMesure />
+        <RenvoiWeb />
+        <Faq />
+        <AppelFinal />
       </main>
-      <Footer />
+
+      <SiteFooter />
     </div>
   );
 }

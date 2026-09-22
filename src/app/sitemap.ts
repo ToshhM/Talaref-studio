@@ -21,6 +21,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
             changeFrequency: 'monthly',
             priority: 0.9,
         },
+        {
+            url: `${baseUrl}/videos`,
+            changeFrequency: 'weekly',
+            priority: 0.8,
+        },
     ]
 
     // Pages de projets dynamiques
