@@ -144,7 +144,7 @@ export const PROJECTS_DATA: Project[] = [
     tags: ['Photo', 'Mode', 'Portrait', 'Studio'],
     technologies: ['Sony A7IV', '24-70mm f/2.8', 'Adobe Lightroom', 'Photoshop',],
     client: 'Alter',
-    project_date: '2024-14-01',
+    project_date: '2024-01-14',
     featured_image: 'http://www.image-heberg.fr/files/1769892078757193977.jpg',
     images: [
       'https://www.image-heberg.fr/files/176989218170147494.jpg',

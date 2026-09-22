@@ -17,7 +17,12 @@ export type Projet = {
   texte: string;
   /** Deux à trois résultats maximum : au-delà, plus rien ne ressort. */
   kpis: { valeur: string; libelle: string }[];
-  photos: { src?: string; alt: string }[];
+  photos: {
+    src?: string;
+    alt: string;
+    /** Si renseigné, la vignette (src) sert d'affiche et le clic lance cette vidéo à la place de la photo. */
+    video?: string;
+  }[];
 };
 
 export const PROJETS: Projet[] = [
@@ -104,6 +109,11 @@ export const PROJETS: Projet[] = [
       { valeur: "Événement privé", libelle: "clients VIP, discrétion requise" },
     ],
     photos: [
+      {
+        src: "/images/home/printemps-defile-poster.jpg",
+        alt: "Défilé Printemps Vélizy, mode automne-hiver",
+        video: "/videos/printemps-defile.mp4",
+      },
       { src: "/images/home/printemps-presentation.jpg", alt: "Présentation d'accessoires lors de la soirée privée Printemps" },
       { src: "/images/home/printemps-details.jpg", alt: "Sacs et cadeaux Printemps et Chanel" },
       { src: "/images/home/printemps-invites.jpg", alt: "Invitées à la soirée privée Printemps" },

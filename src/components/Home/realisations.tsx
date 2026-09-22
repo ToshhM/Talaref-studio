@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { PROJETS } from "@/data/home-projects";
-import { Media } from "./media";
+import { IconePlay, Media } from "./media";
 
 /**
  * Réalisations en onglets.
@@ -15,17 +15,23 @@ import { Media } from "./media";
  */
 export function Realisations() {
   const [actif, setActif] = useState(PROJETS.findIndex((p) => p.id === "monela"));
+  const [videoOuverte, setVideoOuverte] = useState<number | null>(null);
   const piste = useRef<HTMLDivElement>(null);
   const onglets = useRef<(HTMLButtonElement | null)[]>([]);
 
   const projet = PROJETS[actif];
+
+  function changerOnglet(i: number) {
+    setActif(i);
+    setVideoOuverte(null);
+  }
 
   function auClavier(e: React.KeyboardEvent<HTMLDivElement>) {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
     e.preventDefault();
     const pas = e.key === "ArrowRight" ? 1 : -1;
     const suivant = (actif + pas + PROJETS.length) % PROJETS.length;
-    setActif(suivant);
+    changerOnglet(suivant);
     onglets.current[suivant]?.focus();
   }
 
@@ -57,7 +63,7 @@ export function Realisations() {
                 onglets.current[i] = el;
               }}
               className="tl-onglet"
-              onClick={() => setActif(i)}
+              onClick={() => changerOnglet(i)}
             >
               {p.onglet}
             </button>
@@ -89,9 +95,36 @@ export function Realisations() {
             <div className="tl-carrousel">
               {/* key sur la piste : changer de projet remet le carrousel au début */}
               <div className={`tl-carrousel__piste ${projet.photos.filter((photo) => photo.src).length === 1 ? 'tl-carrousel__piste--unique' : ''}`} ref={piste} key={projet.id}>
-                {projet.photos.filter((photo) => photo.src).map((photo, i) => (
-                  <Media key={i} ratio="43" src={photo.src} alt={photo.alt} />
-                ))}
+                {projet.photos.filter((photo) => photo.src).map((photo, i) =>
+                  photo.video ? (
+                    videoOuverte === i ? (
+                      <div key={i} className="tl-media tl-media--43" style={{ padding: 0 }}>
+                        <video
+                          src={photo.video}
+                          poster={photo.src}
+                          controls
+                          autoPlay
+                          playsInline
+                          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      </div>
+                    ) : (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setVideoOuverte(i)}
+                        aria-label={`Lire la vidéo : ${photo.alt}`}
+                        style={{ background: "none", border: 0, padding: 0, margin: 0, cursor: "pointer", display: "block" }}
+                      >
+                        <Media ratio="43" src={photo.src} alt={photo.alt}>
+                          <IconePlay />
+                        </Media>
+                      </button>
+                    )
+                  ) : (
+                    <Media key={i} ratio="43" src={photo.src} alt={photo.alt} />
+                  )
+                )}
               </div>
 
               {projet.photos.filter((photo) => photo.src).length > 1 && <div className="tl-carrousel__nav">
