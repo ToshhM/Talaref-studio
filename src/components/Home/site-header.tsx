@@ -45,7 +45,7 @@ export function SiteHeader() {
 
         <div className="tl-socials">
           <a href="https://instagram.com/talaref.agency" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="tl-social-icon"><IconInstagram /></a>
-          <a href="https://tiktok.com/@talaref.agency" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="tl-social-icon"><IconTikTok /></a>
+          <a href="https://www.tiktok.com/@talarefff" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="tl-social-icon"><IconTikTok /></a>
           <a href="https://www.talaref.media" target="_blank" rel="noopener noreferrer" aria-label="TALAREF Média" className="tl-social-icon tl-social-icon--media"><IconMedia /></a>
         </div>
 

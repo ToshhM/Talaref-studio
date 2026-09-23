@@ -37,7 +37,7 @@ export function SiteFooter() {
             </p>
             <div className="tl-pied__socials">
               <a href="https://instagram.com/talaref.agency" target="_blank" rel="noreferrer" aria-label="Instagram"><IconInstagram /></a>
-              <a href="https://tiktok.com/@talaref.agency" target="_blank" rel="noreferrer" aria-label="TikTok"><IconTikTok /></a>
+              <a href="https://www.tiktok.com/@talarefff" target="_blank" rel="noreferrer" aria-label="TikTok"><IconTikTok /></a>
               <a href="https://www.talaref.media" target="_blank" rel="noreferrer" aria-label="TALAREF Média"><IconMedia /></a>
             </div>
           </div>
