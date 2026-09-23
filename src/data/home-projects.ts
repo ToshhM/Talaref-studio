@@ -259,7 +259,7 @@ export const VIDEOS = [
     categorie: "Mode",
   },
   {
-    libelle: "Interview · Studio TALAREF",
+    libelle: "Vidéo immersive en studio",
     sous: "@didibofficial & @63wog",
     youtubeId: "",
     videoSrc: "/videos/studio-immersion.mp4",
