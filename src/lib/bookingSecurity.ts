@@ -1,4 +1,8 @@
 import { calculateBookingPrice } from "./priceCalculator";
+import {
+  type PodcastCameraCount,
+  type PodcastEditingPackage,
+} from "./podcastOptions";
 
 export type PaymentMode = "full" | "deposit";
 
@@ -15,6 +19,8 @@ export type BookingInput = {
   paymentMode: PaymentMode;
   service: string;
   message: string;
+  podcastCameraCount: PodcastCameraCount | null;
+  podcastEditingPackage: PodcastEditingPackage | null;
 };
 
 const VALID_PAYMENT_MODES = new Set<PaymentMode>(["full", "deposit"]);
@@ -60,7 +66,7 @@ function assertValidDate(value: string, allowPastDate = false) {
 
 export function parseBookingInput(
   body: Record<string, unknown>,
-  options: { allowPastDate?: boolean } = {}
+  options: { allowPastDate?: boolean; allowLegacyPodcast?: boolean } = {}
 ): BookingInput {
   const email = getString(body.email, 254).toLowerCase();
   const firstName = getString(body.firstName, 80);
@@ -72,6 +78,8 @@ export function parseBookingInput(
   const slot = getString(body.slot, 5);
   const service = getString(body.service, 80);
   const message = getString(body.message, 1000);
+  const rawPodcastCameraCount = body.podcastCameraCount;
+  const rawPodcastEditingPackage = body.podcastEditingPackage;
   const duration = Number(body.duration);
   const paymentMode = body.paymentMode;
   const siret = rawSiret.replace(/\s/g, "");
@@ -109,6 +117,34 @@ export function parseBookingInput(
     throw new Error("Mode de paiement invalide.");
   }
 
+  let podcastCameraCount: PodcastCameraCount | null = null;
+  let podcastEditingPackage: PodcastEditingPackage | null = null;
+
+  if (service === "Podcasts") {
+    const hasNoPodcastOptions =
+      rawPodcastCameraCount === undefined && rawPodcastEditingPackage === undefined;
+
+    if (hasNoPodcastOptions && options.allowLegacyPodcast) {
+      // Les anciennes sessions Stripe ne contiennent pas encore les nouvelles options.
+    } else {
+      const parsedCameraCount = Number(rawPodcastCameraCount);
+      if (parsedCameraCount !== 1 && parsedCameraCount !== 2) {
+        throw new Error("Option de tournage podcast invalide.");
+      }
+
+      if (
+        rawPodcastEditingPackage !== "none" &&
+        rawPodcastEditingPackage !== "30min" &&
+        rawPodcastEditingPackage !== "45-60min"
+      ) {
+        throw new Error("Option de montage podcast invalide.");
+      }
+
+      podcastCameraCount = parsedCameraCount;
+      podcastEditingPackage = rawPodcastEditingPackage;
+    }
+  }
+
   return {
     email,
     firstName,
@@ -122,6 +158,8 @@ export function parseBookingInput(
     paymentMode: paymentMode as PaymentMode,
     service,
     message,
+    podcastCameraCount,
+    podcastEditingPackage,
   };
 }
 
@@ -142,8 +180,10 @@ export function parseBookingMetadata(
       paymentMode: metadata?.paymentMode,
       service: metadata?.service,
       message: metadata?.message,
+      podcastCameraCount: metadata?.podcastCameraCount,
+      podcastEditingPackage: metadata?.podcastEditingPackage,
     },
-    { allowPastDate: true }
+    { allowPastDate: true, allowLegacyPodcast: true }
   );
 }
 
@@ -152,7 +192,13 @@ export function calculateExpectedPaymentAmount(input: BookingInput) {
     input.service,
     input.duration,
     input.slot,
-    Boolean(input.siret)
+    Boolean(input.siret),
+    input.podcastCameraCount !== null && input.podcastEditingPackage !== null
+      ? {
+          cameraCount: input.podcastCameraCount,
+          editingPackage: input.podcastEditingPackage,
+        }
+      : undefined
   );
 
   const paidAmount = input.paymentMode === "deposit" ? baseAmount * 0.3 : baseAmount;

@@ -3,6 +3,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Turnstile } from "@marsidev/react-turnstile";
 import { calculateBookingPrice, calculateNightHours } from "@/lib/priceCalculator";
 import { photographerFormulas } from "@/lib/photographerFormulas";
+import {
+  getPodcastOptionsLabel,
+  PODCAST_CAMERA_OPTIONS,
+  PODCAST_EDITING_OPTIONS,
+  type PodcastCameraCount,
+  type PodcastEditingPackage,
+} from "@/lib/podcastOptions";
 import { formatDurationHours } from "@/lib/duration";
 import {
   currentYear,
@@ -53,6 +60,10 @@ export function BookingForm({
   const [selectedDuration, setSelectedDuration] = useState<number>(
     selectedService.baseDuration
   );
+  const [podcastCameraCount, setPodcastCameraCount] =
+    useState<PodcastCameraCount>(1);
+  const [podcastEditingPackage, setPodcastEditingPackage] =
+    useState<PodcastEditingPackage>("none");
   const [paymentMode, setPaymentMode] = useState<"full" | "deposit">("full");
 
   const [bookingDate, setBookingDate] = useState<Date | null>(null);
@@ -95,6 +106,7 @@ export function BookingForm({
   }, [selectedServiceId]);
 
   const isPhotographerService = selectedServiceId === PHOTOGRAPHER_SERVICE_ID;
+  const isPodcastService = selectedServiceId === "podcasts";
 
   const selectedFormula = useMemo(
     () =>
@@ -164,7 +176,10 @@ export function BookingForm({
         pricingServiceTitle,
         pricingDuration,
         selectedSlot || "09:00",
-        isEnterprise
+        isEnterprise,
+        isPodcastService
+          ? { cameraCount: podcastCameraCount, editingPackage: podcastEditingPackage }
+          : undefined
       );
 
       return {
@@ -180,7 +195,17 @@ export function BookingForm({
             : "Impossible de calculer le prix de cette réservation.",
       };
     }
-  }, [isQuoteOnly, pricingServiceTitle, pricingDuration, selectedSlot, isProEmail, isBypassProEmail]);
+  }, [
+    isQuoteOnly,
+    pricingServiceTitle,
+    pricingDuration,
+    selectedSlot,
+    isProEmail,
+    isBypassProEmail,
+    isPodcastService,
+    podcastCameraCount,
+    podcastEditingPackage,
+  ]);
 
   const totalBasePrice = priceComputation.basePrice;
   const priceErrorMessage = priceComputation.error;
@@ -397,6 +422,10 @@ export function BookingForm({
           paymentMode,
           message: userMessage,
           captchaToken,
+          podcastCameraCount: isPodcastService ? podcastCameraCount : undefined,
+          podcastEditingPackage: isPodcastService
+            ? podcastEditingPackage
+            : undefined,
         }),
       });
 
@@ -492,6 +521,70 @@ export function BookingForm({
       )}
 
       <form className="space-y-6" onSubmit={handleBooking}>
+        {isPodcastService && (
+          <div className="space-y-5 rounded-2xl border border-white/10 bg-background/50 p-5">
+            <fieldset>
+              <legend className="mb-3 text-xs font-black uppercase tracking-widest text-white/55">
+                Tournage du podcast
+              </legend>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {PODCAST_CAMERA_OPTIONS.map((option) => (
+                  <label
+                    key={option.cameraCount}
+                    className="cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="podcast-camera-count"
+                      value={option.cameraCount}
+                      checked={podcastCameraCount === option.cameraCount}
+                      onChange={() => setPodcastCameraCount(option.cameraCount)}
+                      className="peer sr-only"
+                    />
+                    <span className="flex min-h-16 items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white/75 transition-colors peer-checked:border-secondaire peer-checked:bg-secondaire/10 peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-secondaire">
+                      <span className="font-bold">{option.label}</span>
+                      <span className="font-black text-secondaire">
+                        {option.price}€
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend className="mb-3 text-xs font-black uppercase tracking-widest text-white/55">
+                Montage (optionnel)
+              </legend>
+              <div className="grid gap-3">
+                {PODCAST_EDITING_OPTIONS.map((option) => (
+                  <label key={option.id} className="cursor-pointer">
+                    <input
+                      type="radio"
+                      name="podcast-editing-package"
+                      value={option.id}
+                      checked={podcastEditingPackage === option.id}
+                      onChange={() => setPodcastEditingPackage(option.id)}
+                      className="peer sr-only"
+                    />
+                    <span className="flex min-h-16 items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white/75 transition-colors peer-checked:border-secondaire peer-checked:bg-secondaire/10 peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-secondaire">
+                      <span>
+                        <span className="block font-bold">{option.label}</span>
+                        <span className="mt-1 block text-xs text-white/45">
+                          {option.description}
+                        </span>
+                      </span>
+                      <span className="shrink-0 font-black text-secondaire">
+                        {option.price === 0 ? "0€" : `+${option.price}€`}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+        )}
+
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="relative space-y-3 z-30" ref={calendarRef}>
             <span className="ml-1 text-xs font-black uppercase tracking-widest text-white/40">
@@ -1251,7 +1344,16 @@ export function BookingForm({
 
         <BookingSummary
           selectedService={selectedService}
-          serviceLabel={isPhotographerService ? selectedFormula.title : selectedService.title}
+          serviceLabel={
+            isPhotographerService
+              ? selectedFormula.title
+              : isPodcastService
+                ? `${selectedService.title} · ${getPodcastOptionsLabel(
+                    podcastCameraCount,
+                    podcastEditingPackage
+                  )}`
+                : selectedService.title
+          }
           bookingDate={bookingDate}
           selectedSlot={selectedSlot}
           durationLabel={isPhotographerService ? formatDurationHours(pricingDuration) : getDurationLabel(selectedDuration)}

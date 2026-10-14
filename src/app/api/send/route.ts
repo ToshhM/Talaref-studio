@@ -6,6 +6,7 @@ import {
   parseBookingInput,
 } from '@/lib/bookingSecurity';
 import { formatDurationHours } from '@/lib/duration';
+import { getPodcastOptionsLabel } from '@/lib/podcastOptions';
 
 function getStripeClient() {
   const secretKey = process.env.STRIPE_SECRET_KEY?.trim();
@@ -81,6 +82,14 @@ export async function POST(req: Request) {
 
     const expectedAmount = calculateExpectedPaymentAmount(booking);
     const amountInCents = expectedAmount.amountInCents;
+    const podcastOptionsLabel =
+      booking.podcastCameraCount !== null &&
+      booking.podcastEditingPackage !== null
+        ? getPodcastOptionsLabel(
+            booking.podcastCameraCount,
+            booking.podcastEditingPackage
+          )
+        : '';
 
     if (!Number.isInteger(amountInCents) || amountInCents <= 0) {
       return NextResponse.json(
@@ -104,7 +113,7 @@ export async function POST(req: Request) {
             currency: 'eur',
             product_data: {
               name: paymentTitle,
-              description: `Client : ${booking.firstName} ${booking.lastName}${
+              description: `${podcastOptionsLabel ? `${podcastOptionsLabel}. ` : ''}Client : ${booking.firstName} ${booking.lastName}${
                 legalName ? ` (${legalName})` : ''
               } - Le ${booking.formattedDate || booking.date} a ${booking.slot} (${formatDurationHours(
                 booking.duration
@@ -130,6 +139,8 @@ export async function POST(req: Request) {
         paymentMode: booking.paymentMode,
         service: booking.service,
         message: booking.message || 'Aucune information',
+        podcastCameraCount: booking.podcastCameraCount?.toString() ?? '',
+        podcastEditingPackage: booking.podcastEditingPackage ?? '',
         baseAmount: formatAmountForMetadata(expectedAmount.baseAmount),
         paidAmount: formatAmountForMetadata(expectedAmount.paidAmount),
       },

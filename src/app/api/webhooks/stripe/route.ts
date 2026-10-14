@@ -8,6 +8,7 @@ import {
   safeHttpsUrl,
 } from '@/lib/bookingSecurity';
 import { formatDurationHours } from '@/lib/duration';
+import { getPodcastOptionsLabel } from '@/lib/podcastOptions';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { getAdminEmail, getMailjetSender, sendMailjetEmail } from '@/lib/mailjet';
 
@@ -254,9 +255,19 @@ export async function POST(req: Request) {
 
     // 2. Double validation du prix payé
     let expectedAmount;
+    let podcastOptionsLabel = '';
     try {
       const booking = parseBookingMetadata(metadata);
       expectedAmount = calculateExpectedPaymentAmount(booking);
+      if (
+        booking.podcastCameraCount !== null &&
+        booking.podcastEditingPackage !== null
+      ) {
+        podcastOptionsLabel = getPodcastOptionsLabel(
+          booking.podcastCameraCount,
+          booking.podcastEditingPackage
+        );
+      }
     } catch (metadataError) {
       console.error('Métadonnées de réservation invalides:', metadataError);
       return NextResponse.json({ error: 'Métadonnées invalides' }, { status: 400 });
@@ -285,6 +296,12 @@ export async function POST(req: Request) {
     }
 
     // 3. Échappement des données
+    const bookingMessage = [
+      podcastOptionsLabel ? `Options podcast : ${podcastOptionsLabel}` : '',
+      message || 'Aucune information complémentaire',
+    ]
+      .filter(Boolean)
+      .join('\n');
     const safe = {
       firstName: escapeHtml(firstName),
       lastName: escapeHtml(lastName),
@@ -296,7 +313,7 @@ export async function POST(req: Request) {
       formattedDate: escapeHtml(formattedDate || date),
       slot: escapeHtml(slot),
       service: escapeHtml(service),
-      message: escapeHtml(message || 'Aucune information complémentaire'),
+      message: escapeHtml(bookingMessage),
     };
 
     const bgColor = '#f9fafb';
@@ -330,7 +347,7 @@ export async function POST(req: Request) {
             duration: Number(duration) || 1,
             payment_mode: paymentMode === 'deposit' ? 'deposit' : 'full',
             amount_paid_cents: session.amount_total ?? 0,
-            message: message || null,
+            message: bookingMessage || null,
           },
           { onConflict: 'stripe_session_id' }
         );

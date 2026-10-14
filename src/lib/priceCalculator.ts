@@ -1,4 +1,9 @@
 import { findFormulaTierPrice } from "./photographerFormulas";
+import {
+  getPodcastOptionsPrice,
+  type PodcastCameraCount,
+  type PodcastEditingPackage,
+} from "./podcastOptions";
 
 export const NIGHT_SURCHARGE = 20;
 
@@ -32,7 +37,11 @@ export function calculateBookingPrice(
   serviceTitle: string,
   duration: number,
   slot: string,
-  isEnterprise: boolean = false
+  isEnterprise: boolean = false,
+  podcastOptions?: {
+    cameraCount: PodcastCameraCount;
+    editingPackage: PodcastEditingPackage;
+  }
 ): number {
   const hasNightHours = calculateNightHours(slot, duration) > 0;
 
@@ -62,10 +71,15 @@ export function calculateBookingPrice(
     }
 
     case "Podcasts": {
-      // Forfait fixe : on check si c'est format long (> 2h) et si ça démarre de nuit
-      const isLongFormat = duration > 2;
-
-      basePrice = isLongFormat ? 790 : 490;
+      if (podcastOptions) {
+        basePrice = getPodcastOptionsPrice(
+          podcastOptions.cameraCount,
+          podcastOptions.editingPackage
+        );
+      } else {
+        // Compatibilité avec les réservations historiques encore traitées par le webhook.
+        basePrice = duration > 2 ? 790 : 490;
+      }
       if (hasNightHours) basePrice += NIGHT_SURCHARGE;
       break;
     }

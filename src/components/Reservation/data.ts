@@ -39,13 +39,13 @@ export const services: Service[] = [
   {
     id: "podcasts",
     title: "Podcasts",
-    eyebrow: "Clé en main",
-    durationText: "Au forfait",
+    eyebrow: "Tournage & montage",
+    durationText: "Options au choix",
     baseDuration: 1,
-    price: "Forfait dès 490€",
+    price: "Dès 75€",
     description:
-      "Enregistrement 4K, setup complet, opérateur, montage et nettoyage audio inclus.",
-    includes: ["Studio + Opérateur", "Enregistrement 4K", "Montage inclus", "Nettoyage Audio"],
+      "Choisissez votre tournage (1 ou 2 caméras), puis ajoutez si vous le souhaitez un montage avec reels.",
+    includes: ["1 caméra : 75€", "2 caméras : 150€", "Montage 30 min + 2 reels : 250€", "Montage 45 min–1 h + 5 reels : 350€"],
   },
   {
     id: "formations",
