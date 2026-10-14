@@ -11,6 +11,9 @@ const TEST_PAYMENT_QUERY_VALUE = "talaref-0v5-2026";
 
 export function ReservationPage() {
   const [selectedServiceId, setSelectedServiceId] = useState(services[0].id);
+  const [selectedPhotographerFormulaId, setSelectedPhotographerFormulaId] =
+    useState("cv-linkedin");
+  const [selectedPhotographerTierIndex, setSelectedPhotographerTierIndex] = useState(0);
   const [isNightTime, setIsNightTime] = useState(false);
 
   useEffect(() => {
@@ -67,13 +70,30 @@ export function ReservationPage() {
           <ServiceSelector
             services={services}
             selectedServiceId={selectedServiceId}
-            onSelectService={(service) => setSelectedServiceId(service.id)}
+            selectedPhotographerFormulaId={selectedPhotographerFormulaId}
+            selectedPhotographerTierIndex={selectedPhotographerTierIndex}
+            onSelectService={(service) => {
+              setSelectedServiceId(service.id);
+              setSelectedPhotographerFormulaId("cv-linkedin");
+              setSelectedPhotographerTierIndex(0);
+            }}
+            onSelectPhotographerFormula={(formulaId, tierIndex) => {
+              setSelectedServiceId("prestation-photographe");
+              setSelectedPhotographerFormulaId(formulaId);
+              setSelectedPhotographerTierIndex(tierIndex);
+            }}
           />
 
           <BookingForm
             selectedService={selectedService}
             selectedServiceId={selectedServiceId}
             isNightTime={isNightTime}
+            selectedPhotographerFormulaId={selectedPhotographerFormulaId}
+            selectedPhotographerTierIndex={selectedPhotographerTierIndex}
+            onPhotographerFormulaChange={(formulaId, tierIndex) => {
+              setSelectedPhotographerFormulaId(formulaId);
+              setSelectedPhotographerTierIndex(tierIndex);
+            }}
           />
         </div>
       </div>

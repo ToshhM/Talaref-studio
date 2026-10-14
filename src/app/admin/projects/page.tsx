@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Project } from "@/lib/database.types";
+import RichTextEditor from "./RichTextEditor";
 
 const CATEGORIES = ["Photo", "Web", "Design", "Projects"] as const;
 
@@ -384,15 +385,16 @@ export default function AdminProjectsPage() {
                 />
               </label>
 
-              <label className="text-xs font-bold uppercase tracking-widest text-white/50 sm:col-span-2">
-                Texte du projet (page détail — du HTML simple est accepté, sinon chaque ligne devient un paragraphe)
-                <textarea
-                  value={form.content}
-                  onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
-                  rows={6}
-                  className="mt-2 w-full rounded-lg border border-white/10 bg-white/[0.06] px-3 py-3 font-mono text-xs text-white"
-                />
-              </label>
+              <div className="text-xs font-bold uppercase tracking-widest text-white/50 sm:col-span-2">
+                Texte détaillé du projet
+                <div className="mt-2 normal-case tracking-normal">
+                  <RichTextEditor
+                    key={editing === "new" ? "new-project" : editing.id}
+                    initialContent={form.content}
+                    onChange={(content) => setForm((current) => ({ ...current, content }))}
+                  />
+                </div>
+              </div>
 
               <label className="text-xs font-bold uppercase tracking-widest text-white/50">
                 Catégorie

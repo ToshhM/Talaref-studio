@@ -263,12 +263,25 @@ export async function POST(req: Request) {
     }
 
     if (session.amount_total !== expectedAmount.amountInCents) {
-      console.error('Montant Stripe inattendu', {
-        sessionId: session.id,
-        expected: expectedAmount.amountInCents,
-        actual: session.amount_total,
-      });
-      return NextResponse.json({ error: 'Montant de paiement incohérent' }, { status: 400 });
+      const storedBaseAmount = Number(metadata.baseAmount);
+      const storedPaidAmount = Number(metadata.paidAmount);
+      const expectedStoredPaidAmount =
+        paymentMode === 'deposit' ? storedBaseAmount * 0.3 : storedBaseAmount;
+      const matchesStoredCheckoutAmount =
+        Number.isFinite(storedBaseAmount) &&
+        Number.isFinite(storedPaidAmount) &&
+        storedBaseAmount > 0 &&
+        Math.round(expectedStoredPaidAmount * 100) === Math.round(storedPaidAmount * 100) &&
+        session.amount_total === Math.round(storedPaidAmount * 100);
+
+      if (!matchesStoredCheckoutAmount) {
+        console.error('Montant Stripe inattendu', {
+          sessionId: session.id,
+          expected: expectedAmount.amountInCents,
+          actual: session.amount_total,
+        });
+        return NextResponse.json({ error: 'Montant de paiement incohérent' }, { status: 400 });
+      }
     }
 
     // 3. Échappement des données

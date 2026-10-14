@@ -1,13 +1,13 @@
 import { Metadata } from 'next'
 import { getAllProjects } from '@/lib/api/projects'
 import { PortfolioGrid } from '@/components/Portfolio'
-import Header from '@/components/Header'
+import { SiteHeader } from '@/components/Home/site-header'
 import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
   alternates: { canonical: '/portfolio' },
-  title: 'Portfolio | TALAREF STUDIO',
-  description: 'Découvrez nos projets en photographie, développement web, design et gestion de projet.',
+  title: 'Nos clients | TALAREF STUDIO',
+  description: 'Découvrez nos clients et études de cas : description détaillée des projets, résultats et données clés.',
 }
 
 export const revalidate = 3600 // Revalidate every hour
@@ -22,7 +22,7 @@ export default async function PortfolioPage({
 
   return (
     <div className="min-h-screen bg-background text-white selection:bg-secondaire selection:text-background">
-      <Header />
+      <SiteHeader />
       <main className="pt-32">
         <PortfolioGrid
           initialProjects={initialProjects}

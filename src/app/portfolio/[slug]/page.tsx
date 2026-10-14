@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getProjectBySlug, getAdjacentProjects } from '@/lib/api/projects'
 import { ProjectDetailLayout } from '@/components/ProjectDetail'
-import Header from '@/components/Header'
+import { SiteHeader } from '@/components/Home/site-header'
 import Footer from '@/components/Footer'
 
 export async function generateMetadata({
@@ -48,7 +48,7 @@ export default async function ProjectPage({
 
   return (
     <div className="min-h-screen bg-background text-white selection:bg-secondaire selection:text-background">
-      <Header />
+      <SiteHeader />
       <main className="pt-20">
         <ProjectDetailLayout
           project={project}

@@ -58,6 +58,30 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
         <h3 className={styles.cardTitle}>{project.title}</h3>
         <p className={styles.cardDescription}>{project.description}</p>
 
+        {/* Key data: client / date / first tag (2-3 données clés) */}
+        <div className={styles.keyDataContainer}>
+          {project.client && (
+            <div className={styles.keyDataItem}>
+              <div className={styles.keyDataLabel}>Client</div>
+              <div className={styles.keyDataValue}>{project.client}</div>
+            </div>
+          )}
+
+          {project.project_date && (
+            <div className={styles.keyDataItem}>
+              <div className={styles.keyDataLabel}>Date</div>
+              <div className={styles.keyDataValue}>{new Date(project.project_date).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })}</div>
+            </div>
+          )}
+
+          {project.tags && project.tags.length > 0 && (
+            <div className={styles.keyDataItem}>
+              <div className={styles.keyDataLabel}>Focus</div>
+              <div className={styles.keyDataValue}>{project.tags[0]}</div>
+            </div>
+          )}
+        </div>
+
         {/* Tags */}
         {project.tags.length > 0 && (
           <div className={styles.tagsContainer}>

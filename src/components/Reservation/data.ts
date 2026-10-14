@@ -22,7 +22,7 @@ export const services: Service[] = [
     baseDuration: 1,
     price: "Dès 40€",
     description:
-      "Location horaire, demi-journée, journée, événements, workshop. Ouvert 24/7.",
+      "Location horaire, demi-journée ou journée pour vos shootings en autonomie, sans photographe. Ouvert 24/7.",
     includes: ["Accès plateau", "Lumières de base", "Espace loge", "Wifi Haut Débit"],
   },
   {
@@ -33,7 +33,7 @@ export const services: Service[] = [
     baseDuration: 0.5,
     price: "Dès 40€",
     description:
-      "CV LinkedIn, Polas, Book, Anniversaire, Couple, Grossesse, Corporate... Choisissez votre formule, le prix s'ajuste automatiquement.",
+      "Portraits CV et LinkedIn, books, séances en couple, grossesse, famille, anniversaire ou corporate. Choisissez votre formule, le prix s'ajuste automatiquement.",
     includes: ["Photographe pro", "Photos retouchées", "Formule adaptée à votre besoin", "Livraison rapide"],
   },
   {

@@ -35,7 +35,7 @@ const ProjectNavigation: React.FC<ProjectNavigationProps> = ({
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        Retour au Portfolio
+        Retour aux clients
       </motion.button>
 
       {nextProject && (

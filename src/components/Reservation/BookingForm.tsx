@@ -31,6 +31,9 @@ type BookingFormProps = {
   selectedService: Service;
   selectedServiceId: string;
   isNightTime: boolean;
+  selectedPhotographerFormulaId: string;
+  selectedPhotographerTierIndex: number;
+  onPhotographerFormulaChange: (formulaId: string, tierIndex: number) => void;
 };
 
 const viewVariants = {
@@ -39,7 +42,14 @@ const viewVariants = {
   exit: { opacity: 0, scale: 1.05 },
 };
 
-export function BookingForm({ selectedService, selectedServiceId, isNightTime }: BookingFormProps) {
+export function BookingForm({
+  selectedService,
+  selectedServiceId,
+  isNightTime,
+  selectedPhotographerFormulaId,
+  selectedPhotographerTierIndex,
+  onPhotographerFormulaChange,
+}: BookingFormProps) {
   const [selectedDuration, setSelectedDuration] = useState<number>(
     selectedService.baseDuration
   );
@@ -54,8 +64,6 @@ export function BookingForm({ selectedService, selectedServiceId, isNightTime }:
   const [isTimeOpen, setIsTimeOpen] = useState(false);
   const [isDurationOpen, setIsDurationOpen] = useState(false);
 
-  const [selectedFormulaId, setSelectedFormulaId] = useState<string>(photographerFormulas[0].id);
-  const [selectedTierIndex, setSelectedTierIndex] = useState(0);
   const [isFormulaOpen, setIsFormulaOpen] = useState(false);
   const [isTierOpen, setIsTierOpen] = useState(false);
 
@@ -90,12 +98,12 @@ export function BookingForm({ selectedService, selectedServiceId, isNightTime }:
 
   const selectedFormula = useMemo(
     () =>
-      photographerFormulas.find((formula) => formula.id === selectedFormulaId) ??
+      photographerFormulas.find((formula) => formula.id === selectedPhotographerFormulaId) ??
       photographerFormulas[0],
-    [selectedFormulaId]
+    [selectedPhotographerFormulaId]
   );
 
-  const selectedTier = selectedFormula.tiers[selectedTierIndex] ?? selectedFormula.tiers[0] ?? null;
+  const selectedTier = selectedFormula.tiers[selectedPhotographerTierIndex] ?? selectedFormula.tiers[0] ?? null;
   const isQuoteOnly = isPhotographerService && selectedFormula.tiers.length === 0;
 
   // Titre et durée effectivement utilisés pour le calcul de prix et l'envoi au serveur.
@@ -106,8 +114,6 @@ export function BookingForm({ selectedService, selectedServiceId, isNightTime }:
     setSelectedDuration(selectedService.baseDuration);
     setPaymentMode("full");
     setIsDurationOpen(false);
-    setSelectedFormulaId(photographerFormulas[0].id);
-    setSelectedTierIndex(0);
     setIsFormulaOpen(false);
     setIsTierOpen(false);
   }, [selectedService.id, selectedService.baseDuration]);
@@ -415,6 +421,7 @@ export function BookingForm({ selectedService, selectedServiceId, isNightTime }:
 
   return (
     <motion.aside
+      id="booking-form"
       initial={{ opacity: 0, y: 28 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.18, duration: 0.55 }}
@@ -943,8 +950,7 @@ export function BookingForm({ selectedService, selectedServiceId, isNightTime }:
                         key={formula.id}
                         type="button"
                         onClick={() => {
-                          setSelectedFormulaId(formula.id);
-                          setSelectedTierIndex(0);
+                          onPhotographerFormulaChange(formula.id, 0);
                           setIsFormulaOpen(false);
                         }}
                         className={`flex flex-col items-start rounded-xl px-4 py-3 text-left transition-all ${
@@ -960,6 +966,13 @@ export function BookingForm({ selectedService, selectedServiceId, isNightTime }:
                           }`}
                         >
                           {formula.subtitle}
+                        </span>
+                        <span
+                          className={`mt-1 text-xs leading-5 ${
+                            selectedFormula.id === formula.id ? "text-background/70" : "text-white/55"
+                          }`}
+                        >
+                          {formula.description}
                         </span>
                       </button>
                     ))}
@@ -986,6 +999,7 @@ export function BookingForm({ selectedService, selectedServiceId, isNightTime }:
               className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-background px-5 py-4 text-white outline-none transition-all hover:border-secondaire/40 focus:border-secondaire/60 focus:ring-4 focus:ring-secondaire/10"
             >
               <span>
+                {selectedTier?.label ? `${selectedTier.label} · ` : ""}
                 {formatDurationHours(selectedTier?.duration ?? 0)} · {selectedTier?.price}€ ·{" "}
                 {selectedTier?.photos} photos
               </span>
@@ -1020,16 +1034,16 @@ export function BookingForm({ selectedService, selectedServiceId, isNightTime }:
                         key={tier.duration}
                         type="button"
                         onClick={() => {
-                          setSelectedTierIndex(index);
+                          onPhotographerFormulaChange(selectedPhotographerFormulaId, index);
                           setIsTierOpen(false);
                         }}
                         className={`flex items-center justify-between rounded-xl px-4 py-3 text-sm font-bold transition-all ${
-                          selectedTierIndex === index
+                          selectedPhotographerTierIndex === index
                             ? "bg-secondaire text-background"
                             : "text-white/70 hover:bg-white/10 hover:text-white"
                         }`}
                       >
-                        <span>{formatDurationHours(tier.duration)}</span>
+                        <span>{tier.label ?? formatDurationHours(tier.duration)}</span>
                         <span>
                           {tier.price}€ · {tier.photos} photos
                         </span>
@@ -1041,6 +1055,25 @@ export function BookingForm({ selectedService, selectedServiceId, isNightTime }:
             </AnimatePresence>
           </div>
         )}
+
+        <section className="rounded-2xl border border-white/10 bg-background/70 p-5" aria-live="polite">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-secondaire">
+            À propos de cette prestation
+          </p>
+          <p className="mt-3 text-sm leading-6 text-white/65">
+            {isPhotographerService ? selectedFormula.description : selectedService.description}
+          </p>
+          <ul className="mt-4 grid gap-2 text-sm text-white/70">
+            {isPhotographerService && selectedTier ? (
+              <>
+                <li>{selectedTier.photos} photos</li>
+                {selectedTier.details?.map((detail) => <li key={detail}>{detail}</li>)}
+              </>
+            ) : (
+              selectedService.includes.map((detail) => <li key={detail}>{detail}</li>)
+            )}
+          </ul>
+        </section>
 
         {isQuoteOnly && (
           <div className="rounded-2xl border border-secondaire/30 bg-secondaire/5 p-5 text-sm text-white/80">

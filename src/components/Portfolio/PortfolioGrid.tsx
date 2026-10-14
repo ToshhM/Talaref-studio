@@ -32,10 +32,10 @@ export const PortfolioGrid: React.FC<PortfolioGridProps> = ({
           className="text-center mb-20"
         >
           <span className="text-secondaire font-black tracking-[0.3em] uppercase text-xs">
-            Nos Réalisations
+          Nos réalisations
           </span>
           <h1 className="text-5xl md:text-8xl font-black mt-6 tracking-tighter uppercase">
-            Portfolio
+          Nos clients
           </h1>
         </motion.div>
 

@@ -5,6 +5,7 @@ import ImageGallery from './ImageGallery'
 import ProjectMeta from './ProjectMeta'
 import TechStack from './TechStack'
 import ProjectNavigation from './ProjectNavigation'
+import ProjectStory from './ProjectStory'
 
 export const ProjectDetailLayout: React.FC<ProjectDetailLayoutProps> = ({
   project,
@@ -29,14 +30,9 @@ export const ProjectDetailLayout: React.FC<ProjectDetailLayoutProps> = ({
         date={project.project_date}
       />
 
-      {/* Content Section (if exists) */}
+      {/* Editorial project story */}
       {project.content && (
-        <section className="py-16 px-6 max-w-4xl mx-auto">
-          <div
-            className="prose prose-invert prose-lg max-w-none"
-            dangerouslySetInnerHTML={{ __html: project.content }}
-          />
-        </section>
+        <ProjectStory content={project.content} />
       )}
 
       {/* Technologies Used */}

@@ -97,14 +97,41 @@
 }
 
 .cardDescription {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
   line-height: 1.6;
   margin-bottom: 1rem;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Key data (client/date/focus) */
+.keyDataContainer {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+}
+
+.keyDataItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.keyDataLabel {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.12em;
+  font-weight: 900;
+}
+
+.keyDataValue {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: white;
 }
 
 /* Tags */

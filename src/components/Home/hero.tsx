@@ -1,4 +1,5 @@
 import { ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
 import { Media } from './media';
 
 export function Hero() {
@@ -12,7 +13,7 @@ export function Hero() {
           <p className="tl-lead">Un événement à faire vivre. Une histoire à raconter. Une marque à faire grandir. On imagine, on tourne, on livre.</p>
           <div className="tl-hero__actions">
             <a className="tl-btn tl-btn--lime" href="#rdv">Parlons de votre projet <ArrowUpRight size={18} aria-hidden="true" /></a>
-            <a className="tl-btn tl-btn--fil" href="#cas">Nos réalisations</a>
+            <Link className="tl-btn tl-btn--fil" href="/portfolio">Nos clients</Link>
           </div>
           <p className="tl-hero__note">Appel découverte gratuit · 20 minutes · Sans engagement</p>
         </div>

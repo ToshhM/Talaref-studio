@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
+import styles from './SiteHeader.module.css';
 
 function IconInstagram() {
   return (
@@ -30,27 +32,34 @@ function IconMedia() {
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const isClientsPage = pathname.startsWith('/portfolio');
+  const homeHref = (section: string) => `/#${section}`;
+
   return (
-    <header className="tl-entete" onKeyDown={(event) => { if (event.key === 'Escape') setOpen(false); }}>
-      <div className="tl-rail tl-entete__in">
-        <Link className="tl-marque" href="/" aria-label="TALAREF, accueil"><span className="tl-marque__t">T</span><span className="tl-marque__n">TALAREF<i>.</i></span></Link>
-        <nav id="home-navigation" className={`tl-nav ${open ? 'tl-nav--ouverte' : ''}`} aria-label="Navigation principale" onClick={() => setOpen(false)}>
-          <a href="#formats">Nos formats</a>
-          <a href="#cas">Réalisations</a>
-          <Link href="/videos">Vidéos</Link>
-          <a href="#methode">Méthode</a>
-          <Link href="/portfolio?category=Web">Sites web</Link>
-          <Link href="/reservation">Réserver une séance</Link>
+    <header className={styles.header} onKeyDown={(event) => { if (event.key === 'Escape') setOpen(false); }}>
+      <div className={styles.inner}>
+        <Link className={styles.brand} href="/" aria-label="TALAREF, accueil"><span className={styles.brandMark}>T</span><span className={styles.brandName}>TALAREF<i>.</i></span></Link>
+        <nav id="home-navigation" className={`${styles.nav} ${open ? styles.navOpen : ''}`} aria-label="Navigation principale" onClick={() => setOpen(false)}>
+          <div className={styles.navLinks}>
+            <Link href={homeHref('formats')}>Nos formats</Link>
+            <Link href={homeHref('cas')}>Réalisations</Link>
+            <Link href="/videos">Vidéos</Link>
+            <Link href={homeHref('methode')}>Méthode</Link>
+            <Link href="/portfolio" aria-current={isClientsPage ? 'page' : undefined}>Nos clients</Link>
+            <Link href="/reservation">Réserver une séance</Link>
+          </div>
+          <div className={styles.menuActions}>
+            <div className={styles.socials}>
+              <a href="https://instagram.com/talaref.agency" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className={styles.socialIcon}><IconInstagram /></a>
+              <a href="https://www.tiktok.com/@talarefff" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className={styles.socialIcon}><IconTikTok /></a>
+              <a href="https://www.talaref.media" target="_blank" rel="noopener noreferrer" aria-label="TALAREF Média" className={`${styles.socialIcon} ${styles.socialMedia}`}><IconMedia /></a>
+            </div>
+            <Link className={styles.contactButton} href={homeHref('rdv')}>Parlons de votre projet</Link>
+          </div>
         </nav>
 
-        <div className="tl-socials">
-          <a href="https://instagram.com/talaref.agency" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="tl-social-icon"><IconInstagram /></a>
-          <a href="https://www.tiktok.com/@talarefff" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="tl-social-icon"><IconTikTok /></a>
-          <a href="https://www.talaref.media" target="_blank" rel="noopener noreferrer" aria-label="TALAREF Média" className="tl-social-icon tl-social-icon--media"><IconMedia /></a>
-        </div>
-
-        <a className="tl-btn tl-btn--lime tl-btn--sm" href="#rdv" onClick={() => setOpen(false)}>Parlons de votre projet</a>
-        <button className="tl-menu" type="button" aria-controls="home-navigation" aria-expanded={open} aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'} title={open ? 'Fermer le menu' : 'Ouvrir le menu'} onClick={() => setOpen(!open)}>{open ? <X size={22} /> : <Menu size={22} />}</button>
+        <button className={styles.menu} type="button" aria-controls="home-navigation" aria-expanded={open} aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'} title={open ? 'Fermer le menu' : 'Ouvrir le menu'} onClick={() => setOpen(!open)}>{open ? <X size={22} /> : <Menu size={22} />}</button>
       </div>
     </header>
   );
