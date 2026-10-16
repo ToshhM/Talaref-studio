@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import type { PhotographerFormula } from "@/lib/photographerFormulas";
 import { photographerFormulas } from "@/lib/photographerFormulas";
+import { formatDurationHours } from "@/lib/duration";
 import type { Service } from "./data";
 
 type ServiceSelectorProps = {
@@ -41,6 +43,8 @@ export function ServiceSelector({
   onSelectService,
   onSelectPhotographerFormula,
 }: ServiceSelectorProps) {
+  const [expandedFormulaId, setExpandedFormulaId] = useState<string | null>(null);
+
   const renderCard = ({
     selected,
     eyebrow,
@@ -49,6 +53,8 @@ export function ServiceSelector({
     durationText,
     price,
     onClick,
+    optionsId,
+    optionsExpanded = false,
     children,
   }: {
     selected: boolean;
@@ -58,20 +64,25 @@ export function ServiceSelector({
     durationText: string;
     price: string;
     onClick: () => void;
+    optionsId?: string;
+    optionsExpanded?: boolean;
     children?: React.ReactNode;
   }) => (
     <button
+      key={title}
       type="button"
       aria-pressed={selected}
+      aria-expanded={optionsId ? optionsExpanded : undefined}
+      aria-controls={optionsId && optionsExpanded ? optionsId : undefined}
       onClick={onClick}
-      className={`w-full rounded-[1.5rem] border p-6 text-left transition-all ${
+      className={`w-full cursor-pointer rounded-[1.5rem] border p-6 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondaire ${
         selected
           ? "border-secondaire bg-secondaire text-background shadow-xl shadow-secondaire/10"
           : "border-white/10 bg-background/70 text-white hover:border-secondaire/40"
       }`}
     >
       <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-        <div>
+        <div className="min-w-0 flex-1">
           <span
             className={`text-[10px] font-black uppercase tracking-[0.3em] ${
               selected ? "text-background/60" : "text-secondaire"
@@ -93,14 +104,17 @@ export function ServiceSelector({
         </div>
 
         <div className="shrink-0 md:text-right">
-          <p className="text-sm font-black uppercase tracking-widest">{durationText}</p>
-          <p
-            className={`mt-2 text-sm font-bold ${
-              selected ? "text-background/70" : "text-white/45"
-            }`}
-          >
+          <span className="block text-sm font-black uppercase tracking-widest">
+            {durationText}
+          </span>
+          <span className={`mt-2 block text-sm font-bold ${selected ? "text-background/70" : "text-white/45"}`}>
             {price}
-          </p>
+          </span>
+          {optionsId && (
+            <span className={`mt-2 block text-xs font-bold ${selected ? "text-background/70" : "text-secondaire"}`}>
+              {optionsExpanded ? "Masquer les options ↑" : "Voir les options ↓"}
+            </span>
+          )}
         </div>
       </div>
     </button>
@@ -123,7 +137,12 @@ export function ServiceSelector({
               const selected =
                 selectedServiceId === "prestation-photographe" &&
                 selectedPhotographerFormulaId === formula.id;
-              const selectedTier = formula.tiers[selectedPhotographerTierIndex];
+              const selectedTier = selected
+                ? formula.tiers[selectedPhotographerTierIndex] ?? formula.tiers[0]
+                : undefined;
+              const hasOptions = formula.tiers.length > 1;
+              const optionsId = `formula-options-${formula.id}`;
+              const optionsExpanded = selected && expandedFormulaId === formula.id;
 
               return (
                 <div key={formula.id} className="grid gap-2">
@@ -132,9 +151,19 @@ export function ServiceSelector({
                     eyebrow: formula.tiers.length === 0 ? "Prestation sur devis" : "Formule avec photographe",
                     title: formula.title,
                     description: formula.description,
-                    durationText: getFormulaDuration(formula),
-                    price: getFormulaPrice(formula),
-                    onClick: () => onSelectPhotographerFormula(formula.id, 0),
+                    durationText: selectedTier
+                      ? formatDurationHours(selectedTier.duration)
+                      : getFormulaDuration(formula),
+                    price: selectedTier ? `${selectedTier.price}€` : getFormulaPrice(formula),
+                    onClick: () => {
+                      setExpandedFormulaId(hasOptions && !optionsExpanded ? formula.id : null);
+                      onSelectPhotographerFormula(
+                        formula.id,
+                        selected ? selectedPhotographerTierIndex : 0
+                      );
+                    },
+                    optionsId: hasOptions ? optionsId : undefined,
+                    optionsExpanded,
                     children: selectedTier?.details?.length ? (
                       <ul
                         className={`mt-4 grid gap-1 text-sm ${
@@ -148,16 +177,22 @@ export function ServiceSelector({
                     ) : null,
                   })}
 
-                  {formula.id === "polas" && (
-                    <div className="grid gap-2 pl-3 sm:grid-cols-3">
+                  {optionsExpanded && hasOptions && (
+                    <div
+                      id={optionsId}
+                      role="group"
+                      aria-label={`Options ${formula.title}`}
+                      className="grid gap-2 sm:grid-cols-3"
+                    >
                       {formula.tiers.map((tier, index) => {
                         const tierSelected = selected && selectedPhotographerTierIndex === index;
 
                         return (
                           <button
-                            key={tier.label}
+                            key={tier.duration}
                             type="button"
                             aria-pressed={tierSelected}
+                            aria-label={`${formula.title} · ${tier.label ? `${tier.label} · ` : ""}${formatDurationHours(tier.duration)} · ${tier.price}€ · ${tier.photos} photos retouchées`}
                             onClick={() => onSelectPhotographerFormula(formula.id, index)}
                             className={`rounded-xl border p-4 text-left transition-all ${
                               tierSelected
@@ -166,22 +201,20 @@ export function ServiceSelector({
                             }`}
                           >
                             <span className="block text-xs font-black uppercase tracking-widest opacity-60">
-                              {tier.label}
+                              {tier.label ?? formatDurationHours(tier.duration)}
                             </span>
                             <span className="mt-1 block text-2xl font-black">
                               {tier.price}€
                             </span>
                             <span className="mt-1 block text-xs opacity-65">
-                              {tier.duration === 0.5
-                                ? "30 min"
-                                : tier.duration === 1
-                                  ? "1 heure"
-                                  : "1 h 30"}{" "}
-                              · {tier.photos} photos
+                              {formatDurationHours(tier.duration)}{" "}
+                              · {tier.photos} photos retouchées
                             </span>
-                            <span className="mt-3 block text-xs leading-5 opacity-75">
-                              {tier.details?.join(" · ")}
-                            </span>
+                            {tier.details?.length ? (
+                              <span className="mt-3 block text-xs leading-5 opacity-75">
+                                {tier.details.join(" · ")}
+                              </span>
+                            ) : null}
                           </button>
                         );
                       })}
@@ -212,7 +245,10 @@ export function ServiceSelector({
                     description: service.description,
                     durationText: service.durationText,
                     price: service.price,
-                    onClick: () => onSelectService(service),
+                    onClick: () => {
+                      setExpandedFormulaId(null);
+                      onSelectService(service);
+                    },
                     children: (
                       <ul
                         className={`mt-4 grid gap-1 text-sm ${

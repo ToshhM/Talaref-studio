@@ -1094,7 +1094,7 @@ export function BookingForm({
               <span>
                 {selectedTier?.label ? `${selectedTier.label} · ` : ""}
                 {formatDurationHours(selectedTier?.duration ?? 0)} · {selectedTier?.price}€ ·{" "}
-                {selectedTier?.photos} photos
+                {selectedTier?.photos} photos retouchées
               </span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1138,7 +1138,7 @@ export function BookingForm({
                       >
                         <span>{tier.label ?? formatDurationHours(tier.duration)}</span>
                         <span>
-                          {tier.price}€ · {tier.photos} photos
+                          {tier.price}€ · {tier.photos} photos retouchées
                         </span>
                       </button>
                     ))}
@@ -1159,7 +1159,7 @@ export function BookingForm({
           <ul className="mt-4 grid gap-2 text-sm text-white/70">
             {isPhotographerService && selectedTier ? (
               <>
-                <li>{selectedTier.photos} photos</li>
+                <li>{selectedTier.photos} photos retouchées</li>
                 {selectedTier.details?.map((detail) => <li key={detail}>{detail}</li>)}
               </>
             ) : (
