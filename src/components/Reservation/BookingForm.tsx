@@ -57,14 +57,18 @@ export function BookingForm({
   selectedPhotographerTierIndex,
   onPhotographerFormulaChange,
 }: BookingFormProps) {
-  const [selectedDuration, setSelectedDuration] = useState<number>(
-    selectedService.baseDuration
-  );
+  const [durationSelection, setDurationSelection] = useState({
+    serviceId: selectedServiceId,
+    duration: selectedService.baseDuration,
+  });
   const [podcastCameraCount, setPodcastCameraCount] =
     useState<PodcastCameraCount>(1);
   const [podcastEditingPackage, setPodcastEditingPackage] =
     useState<PodcastEditingPackage>("none");
-  const [paymentMode, setPaymentMode] = useState<"full" | "deposit">("full");
+  const [paymentSelection, setPaymentSelection] = useState<{
+    serviceId: string;
+    mode: "full" | "deposit";
+  }>({ serviceId: selectedServiceId, mode: "full" });
 
   const [bookingDate, setBookingDate] = useState<Date | null>(null);
   const [dateInputValue, setDateInputValue] = useState("");
@@ -96,6 +100,12 @@ export function BookingForm({
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [promoInput, setPromoInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<{
+    key: string; code: string; discountCents: number; totalCents: number; paidCents: number; remainingCents: number;
+  } | null>(null);
+  const [promoError, setPromoError] = useState("");
+  const [isCheckingPromo, setIsCheckingPromo] = useState(false);
 
   const calendarRef = useRef<HTMLDivElement>(null);
 
@@ -105,6 +115,15 @@ export function BookingForm({
     return BOOKING_DURATIONS;
   }, [selectedServiceId]);
 
+  const selectedDuration =
+    durationSelection.serviceId === selectedServiceId &&
+    durationOptions.includes(durationSelection.duration)
+      ? durationSelection.duration
+      : durationOptions[0];
+  const paymentMode =
+    paymentSelection.serviceId === selectedServiceId
+      ? paymentSelection.mode
+      : "full";
   const isPhotographerService = selectedServiceId === PHOTOGRAPHER_SERVICE_ID;
   const isPodcastService = selectedServiceId === "podcasts";
 
@@ -122,19 +141,13 @@ export function BookingForm({
   const pricingServiceTitle = isPhotographerService ? selectedFormula.title : selectedService.title;
   const pricingDuration = isPhotographerService ? (selectedTier?.duration ?? 0) : selectedDuration;
 
-  useEffect(() => {
-    setSelectedDuration(selectedService.baseDuration);
-    setPaymentMode("full");
-    setIsDurationOpen(false);
-    setIsFormulaOpen(false);
-    setIsTierOpen(false);
-  }, [selectedService.id, selectedService.baseDuration]);
+  const selectDuration = (duration: number) => {
+    setDurationSelection({ serviceId: selectedServiceId, duration });
+  };
 
-  useEffect(() => {
-    if (!durationOptions.includes(selectedDuration)) {
-      setSelectedDuration(durationOptions[0]);
-    }
-  }, [durationOptions, selectedDuration]);
+  const selectPaymentMode = (mode: "full" | "deposit") => {
+    setPaymentSelection({ serviceId: selectedServiceId, mode });
+  };
 
   const checkEmailDomain = (email: string) => {
     if (!email || !email.includes("@")) {
@@ -209,6 +222,37 @@ export function BookingForm({
 
   const totalBasePrice = priceComputation.basePrice;
   const priceErrorMessage = priceComputation.error;
+  const promoQuote = {
+    service: pricingServiceTitle,
+    duration: pricingDuration,
+    slot: selectedSlot || "09:00",
+    paymentMode,
+    isEnterprise: isProEmail && !isBypassProEmail,
+    podcastCameraCount: isPodcastService ? podcastCameraCount : undefined,
+    podcastEditingPackage: isPodcastService ? podcastEditingPackage : undefined,
+  };
+  const promoKey = JSON.stringify({ ...promoQuote, code: promoInput.trim().toUpperCase(), totalBasePrice });
+  const activePromo = !isQuoteOnly && appliedPromo?.key === promoKey ? appliedPromo : null;
+  const promoNeedsValidation = Boolean(promoInput.trim()) && !activePromo && !isQuoteOnly;
+
+  const applyPromo = async () => {
+    setIsCheckingPromo(true);
+    setPromoError("");
+    setAppliedPromo(null);
+    try {
+      const response = await fetch("/api/promo-codes/validate", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...promoQuote, code: promoInput }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Code promo invalide.");
+      setAppliedPromo({ ...data, key: promoKey });
+    } catch (error) {
+      setPromoError(error instanceof Error ? error.message : "Impossible de vérifier ce code promo.");
+    } finally {
+      setIsCheckingPromo(false);
+    }
+  };
 
   const selectedNightHours = useMemo(() => {
     if (!selectedSlot || isQuoteOnly) return 0;
@@ -220,14 +264,16 @@ export function BookingForm({
   }, [selectedSlot, pricingDuration, isQuoteOnly]);
 
   const dynamicPrice = useMemo(() => {
+    if (activePromo) return formatPrice(activePromo.paidCents / 100);
     const price = paymentMode === "deposit" ? totalBasePrice * 0.3 : totalBasePrice;
     return formatPrice(price);
-  }, [totalBasePrice, paymentMode]);
+  }, [totalBasePrice, paymentMode, activePromo]);
 
   const remainingAmount = useMemo(() => {
     if (paymentMode !== "deposit") return 0;
+    if (activePromo) return activePromo.remainingCents / 100;
     return totalBasePrice * 0.7;
-  }, [totalBasePrice, paymentMode]);
+  }, [totalBasePrice, paymentMode, activePromo]);
 
   const availableTimeSlots = useMemo(() => {
     if (!bookingDate) return [];
@@ -345,6 +391,8 @@ export function BookingForm({
 
   const isSubmitDisabled =
     isSending ||
+    isCheckingPromo ||
+    promoNeedsValidation ||
     !captchaToken ||
     isSuccess ||
     !firstName.trim() ||
@@ -422,6 +470,7 @@ export function BookingForm({
           paymentMode,
           message: userMessage,
           captchaToken,
+          promoCode: activePromo?.code,
           podcastCameraCount: isPodcastService ? podcastCameraCount : undefined,
           podcastEditingPackage: isPodcastService
             ? podcastEditingPackage
@@ -977,7 +1026,7 @@ export function BookingForm({
                         key={opt}
                         type="button"
                         onClick={() => {
-                          setSelectedDuration(opt);
+                          selectDuration(opt);
                           setIsDurationOpen(false);
                         }}
                         className={`rounded-xl px-4 py-3 text-sm font-bold transition-all ${
@@ -1094,7 +1143,7 @@ export function BookingForm({
               <span>
                 {selectedTier?.label ? `${selectedTier.label} · ` : ""}
                 {formatDurationHours(selectedTier?.duration ?? 0)} · {selectedTier?.price}€ ·{" "}
-                {selectedTier?.photos} photos
+                {selectedTier?.photos} photos retouchées
               </span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1138,7 +1187,7 @@ export function BookingForm({
                       >
                         <span>{tier.label ?? formatDurationHours(tier.duration)}</span>
                         <span>
-                          {tier.price}€ · {tier.photos} photos
+                          {tier.price}€ · {tier.photos} photos retouchées
                         </span>
                       </button>
                     ))}
@@ -1159,7 +1208,7 @@ export function BookingForm({
           <ul className="mt-4 grid gap-2 text-sm text-white/70">
             {isPhotographerService && selectedTier ? (
               <>
-                <li>{selectedTier.photos} photos</li>
+                <li>{selectedTier.photos} photos retouchées</li>
                 {selectedTier.details?.map((detail) => <li key={detail}>{detail}</li>)}
               </>
             ) : (
@@ -1185,7 +1234,7 @@ export function BookingForm({
                 <button
                   key={mode}
                   type="button"
-                  onClick={() => setPaymentMode(mode)}
+                  onClick={() => selectPaymentMode(mode)}
                   className={`relative z-10 w-1/2 rounded-xl py-3 text-sm font-bold transition-colors duration-300 ${
                     paymentMode === mode
                       ? "text-background"
@@ -1342,6 +1391,24 @@ export function BookingForm({
           />
         </label>
 
+        {!isQuoteOnly && selectedServiceId !== "test-paiement-talaref" && (
+          <section className="rounded-2xl border border-white/10 bg-background/70 p-5">
+            <label htmlFor="creator-promo" className="text-xs font-black uppercase tracking-widest text-white/60">Code promo créateur</label>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <input id="creator-promo" type="text" autoComplete="off" maxLength={40}
+                value={promoInput} onChange={(event) => { setPromoInput(event.target.value.toUpperCase()); setPromoError(""); }}
+                placeholder="Ex. CREATEUR10" aria-describedby="promo-feedback"
+                className="min-w-0 flex-1 rounded-xl border border-white/10 bg-background px-4 py-3 uppercase text-white outline-none focus:border-secondaire" />
+              <button type="button" onClick={applyPromo} disabled={!promoInput.trim() || isCheckingPromo || Boolean(activePromo)}
+                className="rounded-xl bg-secondaire px-4 py-3 text-sm font-bold text-background disabled:opacity-40">{isCheckingPromo ? "Vérification…" : activePromo ? "Appliqué" : "Appliquer"}</button>
+              {promoInput && <button type="button" onClick={() => { setPromoInput(""); setAppliedPromo(null); setPromoError(""); }} className="px-2 text-xs text-white/60 underline">Retirer</button>}
+            </div>
+            <p id="promo-feedback" role="status" className={`mt-3 text-xs ${promoError ? "text-red-300" : activePromo ? "text-secondaire" : "text-white/50"}`}>
+              {promoError || (activePromo ? `Code ${activePromo.code} appliqué : −${formatPrice(activePromo.discountCents / 100)} €. La réduction s’applique au total avant l’acompte.` : promoNeedsValidation ? "Appliquez votre code pour vérifier la réduction après chaque changement de prestation ou de tarif, ou retirez-le pour continuer." : "Vous avez un code créateur ? Saisissez-le pour profiter de sa réduction.")}
+            </p>
+          </section>
+        )}
+
         <BookingSummary
           selectedService={selectedService}
           serviceLabel={
@@ -1364,6 +1431,7 @@ export function BookingForm({
           priceErrorMessage={priceErrorMessage}
           selectedNightHours={selectedNightHours}
           isQuoteOnly={isQuoteOnly}
+          promo={activePromo ? { code: activePromo.code, discountAmount: activePromo.discountCents / 100, originalAmount: totalBasePrice, totalAmount: activePromo.totalCents / 100 } : undefined}
         />
 
         <div className="flex justify-center py-2">

@@ -41,6 +41,12 @@ async function getStripeBookings() {
         payment_mode: metadata.paymentMode === "deposit" ? "deposit" : "full",
         amount_paid_cents: session.amount_total || 0,
         message: metadata.message || null,
+        promo_code_id: metadata.promoCodeId || null,
+        promo_code: metadata.promoCode || null,
+        promo_creator_name: metadata.promoCreator || null,
+        original_amount_cents: metadata.originalAmountCents ? Number(metadata.originalAmountCents) : null,
+        discount_amount_cents: metadata.discountAmountCents ? Number(metadata.discountAmountCents) : null,
+        total_amount_cents: metadata.promoCodeId ? Math.round(Number(metadata.baseAmount) * 100) : null,
         client_email_sent_at: null,
         admin_email_sent_at: null,
         review_email_sent_at: null,
@@ -62,7 +68,11 @@ export async function GET() {
   if (error) {
     console.error("Admin studio bookings list error:", error);
     try {
-      return NextResponse.json({ bookings: await getStripeBookings(), source: "stripe" });
+      return NextResponse.json({
+        bookings: await getStripeBookings(),
+        source: "stripe",
+        warning: "Affichage de secours depuis Stripe : la base des réservations est indisponible. Les modifications et le suivi des emails nécessitent son rétablissement.",
+      });
     } catch (stripeError) {
       console.error("Admin Stripe bookings fallback error:", stripeError);
       return NextResponse.json(

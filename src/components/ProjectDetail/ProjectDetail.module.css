@@ -107,6 +107,23 @@
   object-fit: cover;
 }
 
+.galleryButton {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.galleryButton:focus-visible,
+.lightbox button:focus-visible {
+  outline: 3px solid #b8ce20;
+  outline-offset: 3px;
+}
+
 /* Lightbox */
 .lightbox {
   position: fixed;
@@ -125,10 +142,55 @@
   width: 100%;
   max-width: 1400px;
   aspect-ratio: 16 / 10;
+  cursor: default;
 }
 
 .lightboxImage {
   object-fit: contain;
+}
+
+.lightboxClose,
+.lightboxControl {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  background: rgba(0, 24, 41, 0.8);
+  color: white;
+  cursor: pointer;
+}
+
+.lightboxClose {
+  top: 1rem;
+  right: 1rem;
+}
+
+.lightboxControl {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightboxPrevious {
+  left: 1rem;
+}
+
+.lightboxNext {
+  right: 1rem;
+}
+
+.lightboxCounter {
+  position: absolute;
+  right: 0;
+  bottom: 1rem;
+  left: 0;
+  z-index: 2;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
 }
 
 /* Meta Section */

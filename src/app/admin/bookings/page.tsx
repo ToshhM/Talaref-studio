@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatDurationHours } from "@/lib/duration";
+import { bookingDateInput, formatBookingDate, formatEmailDate as formatDate } from "@/lib/adminBookingDates";
 import type { EventBooking, StudioBooking } from "@/lib/database.types";
 
 type BookingType = "studio" | "congo";
@@ -34,7 +35,7 @@ function toUnified(studio: StudioBooking[], congo: EventBooking[]): UnifiedBooki
     phone: booking.phone || "—",
     date: booking.booking_date,
     slot: booking.slot,
-    detail: `${booking.service} · ${formatDurationHours(Number(booking.duration))} · ${(booking.amount_paid_cents / 100).toFixed(2).replace(".", ",")} € ${booking.payment_mode === "deposit" ? "(acompte)" : ""}`.trim(),
+    detail: `${booking.service} · ${formatDurationHours(Number(booking.duration))} · ${(booking.amount_paid_cents / 100).toFixed(2).replace(".", ",")} € ${booking.payment_mode === "deposit" ? "(acompte)" : ""}${booking.promo_code ? ` · Code ${booking.promo_code} (${booking.promo_creator_name})` : ""}`.trim(),
     message: booking.message,
     status: booking.status,
     clientEmailSentAt: booking.client_email_sent_at,
@@ -60,15 +61,6 @@ function toUnified(studio: StudioBooking[], congo: EventBooking[]): UnifiedBooki
   return [...studioRows, ...eventRows].sort((a, b) => `${a.date}${a.slot}`.localeCompare(`${b.date}${b.slot}`));
 }
 
-function formatDate(value: string | null) {
-  if (!value) return "—";
-  return new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
-}
-
-function formatBookingDate(value: string) {
-  return new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" }).format(new Date(`${value}T12:00:00`));
-}
-
 export default function AdminBookingsPage() {
   const router = useRouter();
   const [studioBookings, setStudioBookings] = useState<StudioBooking[]>([]);
@@ -90,19 +82,35 @@ export default function AdminBookingsPage() {
     setIsLoading(true);
     setErrorMessage("");
     try {
-      const [studioRes, congoRes] = await Promise.all([
-        fetch("/api/admin/studio-bookings"),
-        fetch("/api/admin/event-bookings"),
-      ]);
-      if (studioRes.status === 401 || congoRes.status === 401) {
+      const results = await Promise.allSettled([
+        "/api/admin/studio-bookings",
+        "/api/admin/event-bookings",
+      ].map(async (url) => {
+        const response = await fetch(url);
+        const data = await response.json().catch(() => null);
+        return { response, data };
+      }));
+      if (results.some((result) => result.status === "fulfilled" && result.value.response.status === 401)) {
         router.push("/admin/login");
         return;
       }
-      const studioData = await studioRes.json().catch(() => null);
-      const congoData = await congoRes.json().catch(() => null);
-      if (studioRes.ok) setStudioBookings(studioData?.bookings || []);
-      if (congoRes.ok) setCongoBookings(congoData?.bookings || []);
-      if (!studioRes.ok || !congoRes.ok) setErrorMessage(studioData?.error || congoData?.error || "Erreur lors du chargement.");
+      const messages: string[] = [];
+      results.forEach((result, index) => {
+        const label = index === 0 ? "Studio" : "Congo";
+        if (result.status === "rejected") {
+          messages.push(`${label} : erreur de connexion. Les données de cette source n’ont pas pu être actualisées.`);
+          return;
+        }
+        const { response, data } = result.value;
+        if (!response.ok || !Array.isArray(data?.bookings)) {
+          messages.push(`${label} : ${data?.error || "Erreur lors du chargement."}`);
+          return;
+        }
+        if (index === 0) setStudioBookings(data.bookings);
+        else setCongoBookings(data.bookings);
+        if (data.warning) messages.push(`${label} : ${data.warning}`);
+      });
+      setErrorMessage(messages.join(" "));
     } catch {
       setErrorMessage("Erreur de connexion.");
     } finally {
@@ -186,7 +194,7 @@ export default function AdminBookingsPage() {
 
   const openEdit = (booking: UnifiedBooking) => {
     setEditing(booking);
-    setEditDate(booking.date);
+    setEditDate(bookingDateInput(booking.date));
     setEditSlot(booking.slot);
     setEditMessage(booking.message || "");
   };
@@ -208,7 +216,7 @@ export default function AdminBookingsPage() {
       <div className="mx-auto max-w-7xl">
         <header className="mb-8 flex flex-wrap items-end justify-between gap-5">
           <div><p className="text-xs font-black uppercase tracking-[0.3em] text-secondaire">Admin · Talaref Studio</p><h1 className="mt-2 text-4xl font-black uppercase tracking-tight">Réservations</h1><p className="mt-2 text-sm text-white/50">Le suivi opérationnel de vos clients, créneaux et confirmations.</p></div>
-          <div className="flex gap-3"><button onClick={() => router.push("/admin/projects")} className="rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-black uppercase tracking-widest text-white/70">Projets</button><button onClick={sendTestEmail} disabled={isSendingTest} className="rounded-full border border-secondaire/40 bg-secondaire/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-secondaire">{isSendingTest ? "Envoi..." : "Tester Mailjet"}</button><button onClick={async () => { await fetch("/api/admin/logout", { method: "POST" }); router.push("/admin/login"); }} className="rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-black uppercase tracking-widest text-white/70">Déconnexion</button></div>
+          <div className="flex flex-wrap gap-3"><button onClick={() => router.push("/admin/promo-codes")} className="rounded-full border border-secondaire/40 bg-secondaire/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-secondaire">Codes promo</button><button onClick={() => router.push("/admin/projects")} className="rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-black uppercase tracking-widest text-white/70">Projets</button><button onClick={sendTestEmail} disabled={isSendingTest} className="rounded-full border border-secondaire/40 bg-secondaire/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-secondaire">{isSendingTest ? "Envoi..." : "Tester Mailjet"}</button><button onClick={async () => { await fetch("/api/admin/logout", { method: "POST" }); router.push("/admin/login"); }} className="rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-black uppercase tracking-widest text-white/70">Déconnexion</button></div>
         </header>
         {testMessage && <p className="mb-5 text-sm text-secondaire">{testMessage}</p>}
         {errorMessage && <p className="mb-5 text-sm text-red-400">{errorMessage}</p>}

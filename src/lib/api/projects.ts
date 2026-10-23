@@ -6,6 +6,32 @@ import { Project } from '../database.types'
 // typegen selon les versions) — les `as Project[]` ci-dessous comblent
 // l'écart. Les données runtime, elles, correspondent bien au type `Project`.
 
+const LOCAL_IMAGE_PATHS: Record<string, string> = {
+  '/images/projects/monela/sublimez-vous.png':
+    '/images/projects/monela/Sublimez-vous.png',
+  '/images/projects/monela/abonnez.png':
+    '/images/projects/monela/Abonnez.png',
+}
+
+function normalizeProjectImageUrl(url: string): string {
+  if (LOCAL_IMAGE_PATHS[url]) return LOCAL_IMAGE_PATHS[url]
+
+  return url.replace(
+    /^http:\/\/(?:www\.)?image-heberg\.fr\//i,
+    'https://www.image-heberg.fr/'
+  )
+}
+
+function normalizeProjectImages(project: Project): Project {
+  return {
+    ...project,
+    featured_image: project.featured_image
+      ? normalizeProjectImageUrl(project.featured_image)
+      : null,
+    images: project.images.map(normalizeProjectImageUrl),
+  }
+}
+
 /**
  * Récupère tous les projets publiés
  */
@@ -22,7 +48,7 @@ export async function getAllProjects(): Promise<Project[]> {
     return []
   }
 
-  return (data as Project[] | null) || []
+  return ((data as Project[] | null) || []).map(normalizeProjectImages)
 }
 
 /**
@@ -42,7 +68,7 @@ export async function getProjectsByCategory(category: Project['category']): Prom
     return []
   }
 
-  return (data as Project[] | null) || []
+  return ((data as Project[] | null) || []).map(normalizeProjectImages)
 }
 
 /**
@@ -61,7 +87,7 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     return null
   }
 
-  return data as Project | null
+  return data ? normalizeProjectImages(data as Project) : null
 }
 
 /**
@@ -81,7 +107,7 @@ export async function getFeaturedProjects(limit: number = 6): Promise<Project[]>
     return []
   }
 
-  return (data as Project[] | null) || []
+  return ((data as Project[] | null) || []).map(normalizeProjectImages)
 }
 
 /**
@@ -98,7 +124,7 @@ export async function getAdjacentProjects(
     .eq('category', category)
     .order('order_index', { ascending: true })
 
-  const allProjects = data as Project[] | null
+  const allProjects = (data as Project[] | null)?.map(normalizeProjectImages)
 
   if (!allProjects) return { next: null, prev: null }
 

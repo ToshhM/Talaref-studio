@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "@/styles/home.css";
 
 import { SiteHeader } from "@/components/Home/site-header";
@@ -30,15 +31,15 @@ export default function PageVideos() {
           <div className="tl-rail">
             <div className="tl-tete">
               <p className="tl-sur-titre">Nos vidéos</p>
-              <h2>Formats courts, montés pour être regardés jusqu&apos;au bout</h2>
+              <h1>Formats courts, montés pour être regardés jusqu&apos;au bout</h1>
             </div>
 
             <VideosGallery />
 
             <div style={{ marginTop: 26 }}>
-              <a className="tl-btn tl-btn--lime" href="/#rdv">
+              <Link className="tl-btn tl-btn--lime" href="/#rdv">
                 Parlons de votre vidéo
-              </a>
+              </Link>
             </div>
           </div>
         </section>

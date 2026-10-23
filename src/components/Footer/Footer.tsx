@@ -1,6 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
+import Link from 'next/link';
 import styles from './Footer.module.css';
 
 const socialLinks = [
@@ -25,20 +27,20 @@ export default function Footer() {
                 <div className={styles.main}>
                     {/* Brand Column */}
                     <div className={styles.brand}>
-                        <motion.a
-                            href="/#hero"
-                            className={styles.logo}
-                            whileHover={{ scale: 1.05 }}
-                        >
-                            <div className={styles.logoIcon}>
-                                <img
-                                    src="/images/logo-flame.png"
-                                    alt="TALAREF Logo"
-                                    className={styles.logoImage}
-                                />
-                            </div>
-                            <span className={styles.logoText}>TALAREF</span>
-                        </motion.a>
+                        <motion.div whileHover={{ scale: 1.05 }}>
+                            <Link className={styles.logo} href="/#hero">
+                                <div className={styles.logoIcon}>
+                                    <Image
+                                        src="/images/logo-flame.png"
+                                        alt="TALAREF Logo"
+                                        width={40}
+                                        height={40}
+                                        className={styles.logoImage}
+                                    />
+                                </div>
+                                <span className={styles.logoText}>TALAREF</span>
+                            </Link>
+                        </motion.div>
                         <p className={styles.tagline}>
                             La forge de vos idées,<br />
                             le feu de votre succès.
