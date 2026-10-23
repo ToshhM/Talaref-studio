@@ -14,6 +14,7 @@ type BookingSummaryProps = {
   priceErrorMessage: string;
   selectedNightHours?: number;
   isQuoteOnly?: boolean;
+  promo?: { code: string; discountAmount: number; originalAmount: number; totalAmount: number };
 };
 
 export function BookingSummary({
@@ -29,6 +30,7 @@ export function BookingSummary({
   priceErrorMessage,
   selectedNightHours = 0,
   isQuoteOnly = false,
+  promo,
 }: BookingSummaryProps) {
   const hasFlatEveningSurcharge =
     selectedService.title === "Location Du Studio" || selectedService.id === "prestation-photographe";
@@ -78,6 +80,14 @@ export function BookingSummary({
               +20€
             </strong>
           </p>
+        )}
+
+        {promo && !isQuoteOnly && (
+          <div className="space-y-2 border-t border-white/10 pt-3">
+            <p className="flex justify-between gap-4"><span>Prix avant réduction</span><span className="line-through">{formatPrice(promo.originalAmount)}€</span></p>
+            <p className="flex justify-between gap-4 text-secondaire"><span>Code {promo.code}</span><strong>−{formatPrice(promo.discountAmount)}€</strong></p>
+            <p className="flex justify-between gap-4"><span>Total après réduction</span><strong className="text-white">{formatPrice(promo.totalAmount)}€</strong></p>
+          </div>
         )}
 
         {priceErrorMessage && (

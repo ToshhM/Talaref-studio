@@ -7,6 +7,8 @@ import {
 } from '@/lib/bookingSecurity';
 import { formatDurationHours } from '@/lib/duration';
 import { getPodcastOptionsLabel } from '@/lib/podcastOptions';
+import { resolvePromoCode } from '@/lib/promoCodes.server';
+import { PromoCodeError } from '@/lib/promoCodes';
 
 function getStripeClient() {
   const secretKey = process.env.STRIPE_SECRET_KEY?.trim();
@@ -81,7 +83,11 @@ export async function POST(req: Request) {
     }
 
     const expectedAmount = calculateExpectedPaymentAmount(booking);
-    const amountInCents = expectedAmount.amountInCents;
+    const hasPromoCode = body.promoCode !== undefined && body.promoCode !== '';
+    const appliedPromo = hasPromoCode
+      ? await resolvePromoCode(body.promoCode, booking.service, expectedAmount.baseAmount, booking.paymentMode)
+      : null;
+    const amountInCents = appliedPromo?.amounts.paidCents ?? expectedAmount.amountInCents;
     const podcastOptionsLabel =
       booking.podcastCameraCount !== null &&
       booking.podcastEditingPackage !== null
@@ -141,8 +147,17 @@ export async function POST(req: Request) {
         message: booking.message || 'Aucune information',
         podcastCameraCount: booking.podcastCameraCount?.toString() ?? '',
         podcastEditingPackage: booking.podcastEditingPackage ?? '',
-        baseAmount: formatAmountForMetadata(expectedAmount.baseAmount),
-        paidAmount: formatAmountForMetadata(expectedAmount.paidAmount),
+        baseAmount: formatAmountForMetadata(appliedPromo ? appliedPromo.amounts.totalCents / 100 : expectedAmount.baseAmount),
+        paidAmount: formatAmountForMetadata(amountInCents / 100),
+        ...(appliedPromo ? {
+          promoCodeId: appliedPromo.promo.id,
+          promoCode: appliedPromo.promo.code,
+          promoCreator: appliedPromo.promo.creator_name,
+          promoDiscountType: appliedPromo.promo.discount_type,
+          promoDiscountValue: String(appliedPromo.promo.discount_value),
+          originalAmountCents: String(appliedPromo.amounts.originalCents),
+          discountAmountCents: String(appliedPromo.amounts.discountCents),
+        } : {}),
       },
       success_url: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/reservation`,
@@ -157,6 +172,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
+    if (error instanceof PromoCodeError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     console.error('Erreur serveur/Stripe :', error);
 
     return NextResponse.json(

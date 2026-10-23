@@ -28,12 +28,37 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
+.projectCard:focus-within {
+  border-color: rgba(184, 206, 32, 0.65);
+  box-shadow: 0 0 0 3px rgba(184, 206, 32, 0.2);
+}
+
+.projectCardLink {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.projectCardLink:focus-visible {
+  outline: none;
+}
+
 /* Image Container */
 .imageContainer {
   position: relative;
   height: 60%;
   width: 100%;
   overflow: hidden;
+}
+
+.imagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(ellipse at 70% 25%, rgba(184, 206, 32, 0.18), transparent 38%),
+    linear-gradient(135deg, #003452, #001829 72%);
 }
 
 .image {

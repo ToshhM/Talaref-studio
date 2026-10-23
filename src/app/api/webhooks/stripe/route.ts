@@ -10,6 +10,7 @@ import {
 import { formatDurationHours } from '@/lib/duration';
 import { getPodcastOptionsLabel } from '@/lib/podcastOptions';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { readPromoSnapshot } from '@/lib/promoCodes';
 import { getAdminEmail, getMailjetSender, sendMailjetEmail } from '@/lib/mailjet';
 
 export const runtime = 'nodejs';
@@ -217,13 +218,15 @@ export async function POST(req: Request) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
-  } catch (err: any) {
-    console.error('Erreur signature webhook Stripe:', err.message);
-    return NextResponse.json({ error: `Signature invalide : ${err.message}` }, { status: 400 });
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error('Erreur signature webhook Stripe:', errorMessage);
+    return NextResponse.json({ error: `Signature invalide : ${errorMessage}` }, { status: 400 });
   }
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
+    if (session.payment_status !== 'paid') return NextResponse.json({ received: true });
 
     // 1. Récupérer et valider les métadonnées de réservation
     const metadata = session.metadata;
@@ -255,10 +258,12 @@ export async function POST(req: Request) {
 
     // 2. Double validation du prix payé
     let expectedAmount;
+    let promoAmounts: ReturnType<typeof readPromoSnapshot> = null;
     let podcastOptionsLabel = '';
     try {
       const booking = parseBookingMetadata(metadata);
       expectedAmount = calculateExpectedPaymentAmount(booking);
+      promoAmounts = readPromoSnapshot(metadata, booking.paymentMode);
       if (
         booking.podcastCameraCount !== null &&
         booking.podcastEditingPackage !== null
@@ -273,7 +278,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Métadonnées invalides' }, { status: 400 });
     }
 
-    if (session.amount_total !== expectedAmount.amountInCents) {
+    if (promoAmounts && session.amount_total !== promoAmounts.paidCents) {
+      return NextResponse.json({ error: 'Montant promo incohérent' }, { status: 400 });
+    }
+
+    if (!promoAmounts && session.amount_total !== expectedAmount.amountInCents) {
       const storedBaseAmount = Number(metadata.baseAmount);
       const storedPaidAmount = Number(metadata.paidAmount);
       const expectedStoredPaidAmount =
@@ -297,6 +306,7 @@ export async function POST(req: Request) {
 
     // 3. Échappement des données
     const bookingMessage = [
+      promoAmounts ? `Code promo : ${metadata.promoCode} · Créateur : ${metadata.promoCreator} · Réduction : ${(promoAmounts.discountCents / 100).toFixed(2)} € · Total après réduction : ${(promoAmounts.totalCents / 100).toFixed(2)} €` : '',
       podcastOptionsLabel ? `Options podcast : ${podcastOptionsLabel}` : '',
       message || 'Aucune information complémentaire',
     ]
@@ -348,15 +358,25 @@ export async function POST(req: Request) {
             payment_mode: paymentMode === 'deposit' ? 'deposit' : 'full',
             amount_paid_cents: session.amount_total ?? 0,
             message: bookingMessage || null,
+            ...(promoAmounts ? {
+              promo_code_id: metadata.promoCodeId,
+              promo_code: metadata.promoCode,
+              promo_creator_name: metadata.promoCreator,
+              original_amount_cents: promoAmounts.originalCents,
+              discount_amount_cents: promoAmounts.discountCents,
+              total_amount_cents: promoAmounts.totalCents,
+            } : {}),
           },
           { onConflict: 'stripe_session_id' }
         );
 
       if (bookingUpsertError) {
         console.error("Erreur lors de l'enregistrement de la réservation studio en base :", bookingUpsertError);
+        if (promoAmounts) return NextResponse.json({ error: 'Enregistrement promo à réessayer.' }, { status: 500 });
       }
     } catch (dbError) {
       console.error("Erreur lors de l'enregistrement de la réservation studio en base :", dbError);
+      if (promoAmounts) return NextResponse.json({ error: 'Enregistrement promo à réessayer.' }, { status: 500 });
     }
 
     // Récupérer le charge pour avoir le reçu Stripe
@@ -387,7 +407,7 @@ export async function POST(req: Request) {
 
     if (paymentMode === 'deposit') {
       paymentStatusAdmin = 'Acompte (30%)';
-      const remainingAmount = (amountPaid / 0.3) * 0.7;
+      const remainingAmount = promoAmounts ? promoAmounts.remainingCents / 100 : (amountPaid / 0.3) * 0.7;
       remainingAmountStr = `${remainingAmount.toFixed(2).replace('.', ',')} €`;
 
       paymentStatusClientHtml = `
@@ -507,11 +527,15 @@ export async function POST(req: Request) {
           },
         },
       });
-    } catch (calendarError: any) {
+    } catch (calendarError) {
+      const errorDetails =
+        typeof calendarError === 'object' && calendarError !== null
+          ? (calendarError as { status?: unknown; code?: unknown; message?: unknown })
+          : null;
       const isDuplicate =
-        calendarError?.status === 409 ||
-        calendarError?.code === 409 ||
-        String(calendarError?.message).includes('already exists') ||
+        errorDetails?.status === 409 ||
+        errorDetails?.code === 409 ||
+        String(errorDetails?.message).includes('already exists') ||
         String(calendarError).includes('already exists');
 
       if (isDuplicate) {

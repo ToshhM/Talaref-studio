@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { ReservationHero } from "./ReservationHero";
 import { ServiceSelector } from "./ServiceSelector";
 import { BookingForm } from "./BookingForm";
@@ -9,19 +9,27 @@ import { services, HIDDEN_TEST_SERVICE } from "./data";
 const TEST_PAYMENT_QUERY_KEY = "internal_test";
 const TEST_PAYMENT_QUERY_VALUE = "talaref-0v5-2026";
 
+function subscribeToLocation(callback: () => void) {
+  window.addEventListener("popstate", callback);
+  return () => window.removeEventListener("popstate", callback);
+}
+
+function getIsInternalTestPayment() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(TEST_PAYMENT_QUERY_KEY) === TEST_PAYMENT_QUERY_VALUE;
+}
+
 export function ReservationPage() {
   const [selectedServiceId, setSelectedServiceId] = useState(services[0].id);
+  const isInternalTestPayment = useSyncExternalStore(
+    subscribeToLocation,
+    getIsInternalTestPayment,
+    () => false
+  );
   const [selectedPhotographerFormulaId, setSelectedPhotographerFormulaId] =
     useState("cv-linkedin");
   const [selectedPhotographerTierIndex, setSelectedPhotographerTierIndex] = useState(0);
   const [isNightTime, setIsNightTime] = useState(false);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get(TEST_PAYMENT_QUERY_KEY) === TEST_PAYMENT_QUERY_VALUE) {
-      setSelectedServiceId(HIDDEN_TEST_SERVICE.id);
-    }
-  }, []);
 
   useEffect(() => {
     const checkTime = () => {
@@ -37,7 +45,7 @@ export function ReservationPage() {
           });
           const hour = parseInt(formatter.format(new Date()), 10);
           isNight = hour >= 23 || hour < 9;
-        } catch (e) {
+        } catch {
           const hour = new Date().getHours();
           isNight = hour >= 23 || hour < 9;
         }
@@ -53,10 +61,15 @@ export function ReservationPage() {
   const selectedService = useMemo(
     () =>
       [...services, HIDDEN_TEST_SERVICE].find(
-        (service) => service.id === selectedServiceId
+        (service) =>
+          service.id ===
+          (isInternalTestPayment ? HIDDEN_TEST_SERVICE.id : selectedServiceId)
       ) ?? services[0],
-    [selectedServiceId]
+    [isInternalTestPayment, selectedServiceId]
   );
+  const activeServiceId = isInternalTestPayment
+    ? HIDDEN_TEST_SERVICE.id
+    : selectedServiceId;
 
   return (
     <section className="min-h-screen bg-background px-6 pb-24 pt-36 text-white relative overflow-hidden transition-colors duration-500">
@@ -69,7 +82,7 @@ export function ReservationPage() {
         <div className="mt-14 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
           <ServiceSelector
             services={services}
-            selectedServiceId={selectedServiceId}
+            selectedServiceId={activeServiceId}
             selectedPhotographerFormulaId={selectedPhotographerFormulaId}
             selectedPhotographerTierIndex={selectedPhotographerTierIndex}
             onSelectService={(service) => {
@@ -86,7 +99,7 @@ export function ReservationPage() {
 
           <BookingForm
             selectedService={selectedService}
-            selectedServiceId={selectedServiceId}
+            selectedServiceId={activeServiceId}
             isNightTime={isNightTime}
             selectedPhotographerFormulaId={selectedPhotographerFormulaId}
             selectedPhotographerTierIndex={selectedPhotographerTierIndex}

@@ -21,11 +21,10 @@ export function VideosGallery() {
 
   return (
     <>
-      <div className="tl-onglets" role="tablist" aria-label="Filtrer les vidéos par catégorie">
+      <div className="tl-onglets" role="group" aria-label="Filtrer les vidéos par catégorie">
         <button
           type="button"
-          role="tab"
-          aria-selected={filtre === null}
+          aria-pressed={filtre === null}
           className="tl-onglet"
           onClick={() => setFiltre(null)}
         >
@@ -35,8 +34,7 @@ export function VideosGallery() {
           <button
             key={cat}
             type="button"
-            role="tab"
-            aria-selected={filtre === cat}
+            aria-pressed={filtre === cat}
             className="tl-onglet"
             onClick={() => setFiltre(cat)}
           >
@@ -46,7 +44,7 @@ export function VideosGallery() {
       </div>
 
       {affichees.length > 0 ? (
-        <div className="tl-videos">
+        <div className="tl-videos" aria-live="polite">
           {affichees.map((v) => (
             <FacadeVideo
               key={v.libelle}

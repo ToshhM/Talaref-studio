@@ -48,13 +48,28 @@ const nextConfig: NextConfig = {
         hostname: 'e.pcloud.link',
       },
       {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.image-heberg.fr',
+        pathname: '/files/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
+        pathname: '/vi/**',
+      },
+      {
         protocol: 'http',
         hostname: '192.168.1.192',
         port:'',
         pathname: '/web_images/**',
       },
     ],
-    unoptimized: true,
+    formats: ['image/avif', 'image/webp'],
   },
 };
 

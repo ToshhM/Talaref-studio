@@ -1,3 +1,5 @@
+import type { PromoCodeInput } from "./promoCodes";
+
 export type Json =
   | string
   | number
@@ -12,6 +14,23 @@ export interface Database {
   }
   public: {
     Tables: {
+      creator_promo_codes: {
+        Row: {
+          id: string
+          code: string
+          creator_name: string
+          discount_type: 'percentage' | 'fixed'
+          discount_value: number
+          service_ids: string[]
+          expires_at: string | null
+          active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: PromoCodeInput & { id?: string; created_at?: string; updated_at?: string }
+        Update: Partial<PromoCodeInput> & { updated_at?: string }
+        Relationships: []
+      }
       projects: {
         Row: {
           id: string
@@ -125,6 +144,12 @@ export interface Database {
       }
       studio_bookings: {
         Row: {
+          promo_code_id: string | null
+          promo_code: string | null
+          promo_creator_name: string | null
+          original_amount_cents: number | null
+          discount_amount_cents: number | null
+          total_amount_cents: number | null
           id: string
           stripe_session_id: string
           first_name: string
@@ -149,6 +174,12 @@ export interface Database {
           updated_at: string
         }
         Insert: {
+          promo_code_id?: string | null
+          promo_code?: string | null
+          promo_creator_name?: string | null
+          original_amount_cents?: number | null
+          discount_amount_cents?: number | null
+          total_amount_cents?: number | null
           id?: string
           stripe_session_id: string
           first_name: string
@@ -173,6 +204,12 @@ export interface Database {
           updated_at?: string
         }
         Update: {
+          promo_code_id?: string | null
+          promo_code?: string | null
+          promo_creator_name?: string | null
+          original_amount_cents?: number | null
+          discount_amount_cents?: number | null
+          total_amount_cents?: number | null
           id?: string
           stripe_session_id?: string
           first_name?: string
@@ -199,8 +236,8 @@ export interface Database {
         Relationships: []
       }
     }
-    Views: Record<string, never>
-    Functions: Record<string, never>
+    Views: Record<never, never>
+    Functions: Record<never, never>
     Enums: Record<string, never>
     CompositeTypes: Record<string, never>
   }
